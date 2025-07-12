@@ -23,7 +23,7 @@ session.mount("https://", HTTPAdapter(max_retries=retries))
 
 # Fetch data from OpenSea API (v2)
 def fetch_collection_data(collection_slug):
-    url = f"https://api.opensea.io/v2/collections/{collection_slug}/stats"
+    url = f"https://api.opensea.io/api/v2/collections/{collection_slug}/stats"
 
     headers = {
         "X-API-KEY": OPENSEA_API_KEY,

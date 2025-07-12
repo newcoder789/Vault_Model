@@ -1,1 +1,6 @@
 .\vaultic_venv\
+
+nfts.json
+nft_data_cache.json
+.env
+nfts2.json

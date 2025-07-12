@@ -1,0 +1,46 @@
+import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+# COLLECTIONS = ["bored-ape-yacht-club", "cryptopunks", "azuki"]
+# COLLECTIONS = "0xf54c9a0e44a5f5afd27c7ac8a176a843b9114f1d"
+# url = f"https://api.opensea.io/api/v2/collection/{COLLECTIONS}"
+# url = "https://api.opensea.io/api/v2/collections"
+# url = "https://api.opensea.io/api/v2/chain/{chain}/account/{address}/nfts"
+
+
+
+url = "https://api.opensea.io/api/v2/collections?order_by=market_cap"
+headers = {"accept": "application/json"}
+
+response = requests.get(url, headers=headers)
+data = response.json()["collections"]
+
+session = requests.Session()
+retries = Retry(total=3, backoff_factor=1, status_forcelist=[429, 500, 502, 503, 504])
+session.mount("https://", HTTPAdapter(max_retries=retries))
+nft = []
+lent = 0 
+for collection in data:
+    collection_name = collection["collection"]
+    url = f"https://api.opensea.io/api/v2/collection/{collection_name}/nfts"
+
+    headers = {
+        "accept": "application/json",
+        "User-Agent": "VaulticScoringAPI/1.0",
+    }
+    try:
+        response = session.get(url, headers=headers, timeout=10)
+        response.raise_for_status() # Raise an exception for bad status codes (4xx or 5xx)
+        nft_data = response.json() # Call .json() to parse the JSON response
+        nft.append(nft_data) # Append the parsed JSON data
+        print(nft_data) # Print the parsed JSON data
+        with open("./nfts.json", "w") as f:
+            json.dump(nft_data, f, indent=4) # Use json.dump to write the data to the file with indentation
+            
+    except requests.exceptions.HTTPError as http_err:
+        status_code = http_err.response.status_code
+        if status_code == 404:
+            print("Page not FOund 🥸")  
+            
+    print("***\n***")
+    
