@@ -1,371 +1,319 @@
 import requests
 import pandas as pd
-import numpy as np
-from scipy.stats import linregress
-from textblob import TextBlob
-from datetime import datetime, timedelta
-import json
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import OneHotEncoder
 import os
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
-import time  # For delay
+import sys
+import json
+from datetime import datetime
+import time
 
-# Configuration
-OPENSEA_API_KEY = os.getenv("open_sea")
+# 1. API Setup
+OPENSEA_API_KEY = os.getenv("opensea_api_key")
+ALCHEMY_API_KEY = os.getenv("alchemy_key", "6q_qZNutwscvksSLiK7dYq6NbQ7ddFSd")
 TWITTER_BEARER_TOKEN = os.getenv("twitter_bearer_token")
-NFT_JSON_FILE = "nfts.json"
-CACHE_FILE = "nft_data_cache.json"
-CSV_FILE = "nft_risk_data.csv"
-MAX_TOTAL_EVENTS = 100000  # Overall cap
-EVENTS_PER_PART = 10000  # Target per time part
-LIMIT_PER_CALL = 50  # Reduced to default
-MAX_CALLS_PER_PART = 100  # Prevent infinite looping
+if not OPENSEA_API_KEY:
+    print(
+        "Error: OPENSEA_API_KEY environment variable not set. Sign up at opensea.io for an API key."
+    )
+    sys.exit(1)
+if not ALCHEMY_API_KEY:
+    print("Error: ALCHEMY_API_KEY environment variable not set.")
+    sys.exit(1)
+if not TWITTER_BEARER_TOKEN:
+    print("Error: TWITTER_BEARER_TOKEN environment variable not set.")
+    sys.exit(1)
 
-# Set up requests with retry logic
-session = requests.Session()
-retries = Retry(total=3, backoff_factor=1, status_forcelist=[429, 500, 502, 503, 504])
-session.mount("https://", HTTPAdapter(max_retries=retries))
+BASE_URL_OPENSEA = "https://api.opensea.io/api/v2"
+HEADERS_OPENSEA = {"X-API-KEY": OPENSEA_API_KEY, "accept": "application/json"}
+ALCHEMY_BASE_URL = f"https://eth-mainnet.g.alchemy.com/nft/v3/{ALCHEMY_API_KEY}"
+TWITTER_HEADERS = {"Authorization": f"Bearer {TWITTER_BEARER_TOKEN}"}
+
+# 2. Hardcoded Collection Slugs (Temporary Workaround)
+all_slugs = [
+    "boredapeyachtclub",
+    "mutant-ape-yacht-club",
+    "cryptopunks",
+]  # Add more as needed
+print(f"Using hardcoded slugs: {all_slugs}")
 
 
-# Load cached data with error handling
-def load_cache():
-    print("Loading cache from", CACHE_FILE)
-    if os.path.exists(CACHE_FILE):
+# 3. Fetch NFTs from Collections (OpenSea)
+def fetch_collection_nfts(slug, limit=200, offset=0, max_retries=3):
+    url = f"{BASE_URL_OPENSEA}/collection/{slug}/nfts"
+    params = {"limit": limit, "offset": offset}
+    for attempt in range(max_retries):
         try:
-            with open(CACHE_FILE, "r") as f:
-                cache_data = json.load(f)
-            print(f"Cache loaded with {len(cache_data)} entries")
-            return cache_data
-        except json.JSONDecodeError as e:
-            print(
-                f"Invalid JSON in {CACHE_FILE}, ignoring and starting with empty cache: {e}"
+            response = requests.get(
+                url, headers=HEADERS_OPENSEA, params=params, timeout=10
             )
-            return {}
-    print("No cache file found, starting with empty cache")
+            if response.status_code == 200:
+                return response.json().get("nfts", [])
+            else:
+                print(
+                    f"Attempt {attempt + 1} failed for {slug}: {response.status_code} - {response.text}"
+                )
+                if response.status_code == 429:
+                    time.sleep(2**attempt)
+                else:
+                    break
+        except requests.RequestException as e:
+            print(
+                f"Network error for {slug}: {e}. Attempt {attempt + 1} of {max_retries}"
+            )
+            time.sleep(2**attempt)
+    return []
+
+
+all_nfts_opensea = []
+for slug in all_slugs[:5]:  # Limit to 5 for now
+    offset = 0
+    while True:
+        nfts = fetch_collection_nfts(slug, offset=offset)
+        if not nfts:
+            break
+        all_nfts_opensea.extend(nfts)
+        offset += 200
+        if len(nfts) < 200:
+            break
+
+if not all_nfts_opensea:
+    print("No NFTs fetched from OpenSea. Check API limits or data.")
+    sys.exit(1)
+
+# 4. Fetch NFTs from Alchemy for Owner
+OWNER_ADDRESS = "0xa858ddc0445d8131dac4d1de01f834ffcba52ef1"
+
+
+def fetch_alchemy_nfts(owner, max_retries=3):
+    url = f"{ALCHEMY_BASE_URL}/getNFTsForOwner?owner={owner}"
+    for attempt in range(max_retries):
+        try:
+            response = requests.get(url, timeout=10)
+            if response.status_code == 200:
+                return response.json().get("ownedNfts", [])
+            else:
+                print(
+                    f"Attempt {attempt + 1} failed for Alchemy: {response.status_code} - {response.text}"
+                )
+                time.sleep(2**attempt)
+                break
+        except requests.RequestException as e:
+            print(
+                f"Network error for Alchemy: {e}. Attempt {attempt + 1} of {max_retries}"
+            )
+            time.sleep(2**attempt)
+    return []
+
+
+all_nfts_alchemy = fetch_alchemy_nfts(OWNER_ADDRESS)
+
+
+# 5. Fetch Twitter Data
+def fetch_twitter_data(max_retries=3):
+    url = "https://api.twitter.com/2/tweets/search/recent?query=from:BoredApeYC&max_results=100"
+    for attempt in range(max_retries):
+        try:
+            response = requests.get(url, headers=TWITTER_HEADERS, timeout=10)
+            if response.status_code == 200:
+                return response.json()
+            else:
+                print(
+                    f"Attempt {attempt + 1} failed for Twitter: {response.status_code} - {response.text}"
+                )
+                if response.status_code == 429:
+                    time.sleep(2**attempt)
+                else:
+                    break
+        except requests.RequestException as e:
+            print(
+                f"Network error for Twitter: {e}. Attempt {attempt + 1} of {max_retries}"
+            )
+            time.sleep(2**attempt)
     return {}
 
 
-# Save to cache
-def save_cache(cache):
-    with open(CACHE_FILE, "w") as f:
-        json.dump(cache, f)
-    print(f"Cache saved with {len(cache)} entries to {CACHE_FILE}")
+twitter_data = fetch_twitter_data()
+sentiment_score = 0
+tweet_count = len(twitter_data.get("data", []))
+if tweet_count > 0:
+    for tweet in twitter_data.get("data", []):
+        sentiment_score += 0.5  # Dummy positive sentiment
+    sentiment_score /= tweet_count
+retweets_sum = sum(
+    tweet.get("public_metrics", {}).get("retweet_count", 0)
+    for tweet in twitter_data.get("data", [])
+)
+likes_sum = sum(
+    tweet.get("public_metrics", {}).get("like_count", 0)
+    for tweet in twitter_data.get("data", [])
+)
+avg_retweets = retweets_sum / tweet_count if tweet_count else 0
+avg_likes = likes_sum / tweet_count if tweet_count else 0
 
 
-# Fetch collection stats from OpenSea including creation date
-def fetch_collection_stats(collection_slug):
-    print(f"Fetching collection stats for: {collection_slug}")
-    url = f"https://api.opensea.io/api/v2/collections/{collection_slug}/stats"
-    headers = {"X-API-KEY": OPENSEA_API_KEY, "accept": "application/json"}
-    try:
-        response = session.get(url, headers=headers, timeout=10)
-        response.raise_for_status()
-        stats = response.json().get("total", {})
-        # Assume creation date is in stats or fallback to nfts.json
-        creation_date = stats.get("created_date")
-        if not creation_date:
-            with open(NFT_JSON_FILE, "r") as f:
-                nfts = json.load(f)
-                for nft in nfts:
-                    if nft["collection"] == collection_slug:
-                        creation_date = nft.get("created_date")
-                        break
-        if not creation_date:
-            creation_date = (datetime.now() - timedelta(days=365)).isoformat()
-        print(
-            f"Stats fetched for {collection_slug}: {stats}, creation_date: {creation_date}"
-        )
-        return stats, creation_date
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching stats for {collection_slug}: {e}")
-        return {}, None
-
-
-# Fetch sale events from OpenSea with time parts from creation to now
-def fetch_sale_events(collection_slug):
-    print(f"Fetching sale events for: {collection_slug}")
-    url = "https://api.opensea.io/v2/events"
-    sales = []
-
-    # Get creation date and total days
-    stats, creation_date = fetch_collection_stats(collection_slug)
-    if not creation_date:
-        creation_date = datetime.now() - timedelta(days=90)
-    creation_date = datetime.fromisoformat(creation_date.split("T")[0])
-    total_days = (datetime.now() - creation_date).days
-    if total_days <= 0:
-        total_days = 90
-    part_days = max(total_days // 10, 1)
-
-    # Fetch events from creation to now in 10 parts, capped at today
-    end_time = datetime.now()
-    for i in range(10):
-        start_time = end_time - timedelta(days=part_days)
-        if start_time < creation_date:
-            start_time = creation_date
-        params = {
-            "collection_slug": collection_slug,
-            "event_type": "sale",
-            "occurred_after": int(start_time.timestamp()),
-            "occurred_before": int(end_time.timestamp()),
-            "limit": LIMIT_PER_CALL,
-        }
-        headers = {"X-API-KEY": OPENSEA_API_KEY, "accept": "application/json"}
-        part_sales = []
-        call_count = 0
-        print(f"Processing part: {start_time.date()} to {end_time.date()}")
+# 6. Fetch Collection Metadata for Spam Filtering
+def fetch_collection_metadata(slug, max_retries=3):
+    url = f"{BASE_URL_OPENSEA}/collection/{slug}"
+    for attempt in range(max_retries):
         try:
-            while (
-                call_count < MAX_CALLS_PER_PART
-                and len(part_sales) < EVENTS_PER_PART
-                and len(sales) + len(part_sales) < MAX_TOTAL_EVENTS
-            ):
-                response = session.get(url, params=params, headers=headers, timeout=10)
-                response.raise_for_status()
-                data = response.json()
-                new_sales = data.get("asset_events", [])
-                if not new_sales:
-                    break
-                part_sales.extend(new_sales)
+            response = requests.get(url, headers=HEADERS_OPENSEA, timeout=10)
+            if response.status_code == 200:
+                return response.json()
+            else:
                 print(
-                    f"Fetched {len(new_sales)} events for {start_time.date()} to {end_time.date()}, total so far: {len(sales) + len(part_sales)}"
+                    f"Attempt {attempt + 1} failed for {slug} metadata: {response.status_code} - {response.text}"
                 )
-                if "next" not in data or not data["next"]:
+                if response.status_code == 429:
+                    time.sleep(2**attempt)
+                else:
                     break
-                params["cursor"] = data["next"]
-                call_count += 1
-                time.sleep(1)  # Delay to avoid throttling
-            sales.extend(part_sales[:EVENTS_PER_PART])
+        except requests.RequestException as e:
             print(
-                f"Part {start_time.date()} to {end_time.date()} fetched {len(part_sales[:EVENTS_PER_PART])} events"
+                f"Network error for {slug} metadata: {e}. Attempt {attempt + 1} of {max_retries}"
             )
-        except requests.exceptions.RequestException as e:
-            print(
-                f"Error fetching events for {collection_slug} in {start_time.date()} to {end_time.date()}: {e}, Response: {e.response.text if e.response else 'No response'}"
-            )
-        end_time = start_time
-        if len(sales) >= MAX_TOTAL_EVENTS or start_time <= creation_date:
-            break
-    print(f"Total sale events fetched for {collection_slug}: {len(sales)}")
-    return sales[:MAX_TOTAL_EVENTS]
+            time.sleep(2**attempt)
+    return {}
 
 
-# Fetch crypto prices from CoinGecko
-def fetch_crypto_prices(coin_id):
-    print(f"Fetching crypto prices for: {coin_id}")
-    url = f"https://api.coingecko.com/api/v3/coins/{coin_id}/market_chart"
-    params = {
-        "vs_currency": "usd",
-        "days": max((datetime.now() - datetime(2024, 7, 13)).days, 90),
-        "interval": "daily",
-    }
-    try:
-        response = session.get(url, params=params, timeout=10)
-        response.raise_for_status()
-        prices = [p[1] for p in response.json().get("prices", [])]
-        print(f"Fetched {len(prices)} price points for {coin_id}")
-        return prices
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching {coin_id} prices: {e}")
-        return []
+# 7. Process and Combine Data
+data = {
+    "owner_address": [
+        nft.get("owner", {}).get("address", "") for nft in all_nfts_opensea
+    ]
+    + [nft.get("owner_address", "") for nft in all_nfts_alchemy],
+    "contract_address": [
+        nft.get("contract", {}).get("address", "") for nft in all_nfts_opensea
+    ]
+    + [nft["contract"]["address"] for nft in all_nfts_alchemy],
+    "token_id": [nft.get("token_id", "") for nft in all_nfts_opensea]
+    + [nft["tokenId"] for nft in all_nfts_alchemy],
+    "token_type": [nft.get("token_type", "ERC721") for nft in all_nfts_opensea]
+    + [nft["tokenType"] for nft in all_nfts_alchemy],
+    "balance": [nft.get("balance", 1) for nft in all_nfts_opensea]
+    + [nft["balance"] for nft in all_nfts_alchemy],
+    "collection_name": [
+        nft.get("collection", {}).get("name", "") for nft in all_nfts_opensea
+    ]
+    + [nft["collection"]["name"] for nft in all_nfts_alchemy],
+    "collection_slug": [
+        nft.get("collection", {}).get("slug", "") for nft in all_nfts_opensea
+    ]
+    + [nft["collection"]["slug"] for nft in all_nfts_alchemy],
+    "is_spam": [False] * (len(all_nfts_opensea) + len(all_nfts_alchemy)),
+    "floor_price": [
+        nft.get("collection", {}).get("stats", {}).get("floor_price", 0)
+        for nft in all_nfts_opensea
+    ]
+    + [nft["contract"]["openSeaMetadata"]["floorPrice"] for nft in all_nfts_alchemy],
+    "image_url": [nft.get("image_url", "") for nft in all_nfts_opensea]
+    + [nft["contract"]["openSeaMetadata"]["imageUrl"] for nft in all_nfts_alchemy],
+    "description": [nft.get("description", "") for nft in all_nfts_opensea]
+    + [nft["contract"]["openSeaMetadata"]["description"] for nft in all_nfts_alchemy],
+    "last_ingested_at": [nft.get("last_ingested_at", "") for nft in all_nfts_opensea]
+    + [
+        nft["contract"]["openSeaMetadata"]["lastIngestedAt"] for nft in all_nfts_alchemy
+    ],
+    "total_supply": [
+        nft.get("collection", {}).get("stats", {}).get("total_supply", 0)
+        for nft in all_nfts_opensea
+    ]
+    + [nft["contract"]["totalSupply"] for nft in all_nfts_alchemy],
+    "twitter_sentiment_score": [sentiment_score]
+    * (len(all_nfts_opensea) + len(all_nfts_alchemy)),
+    "tweet_count_last_24h": [tweet_count]
+    * (len(all_nfts_opensea) + len(all_nfts_alchemy)),
+    "avg_retweets_last_24h": [avg_retweets]
+    * (len(all_nfts_opensea) + len(all_nfts_alchemy)),
+    "avg_likes_last_24h": [avg_likes] * (len(all_nfts_opensea) + len(all_nfts_alchemy)),
+}
+
+df = pd.DataFrame(data)
 
 
-# Fetch Twitter sentiment with recent search
-def fetch_twitter_sentiment(collection_name):
-    print(f"Fetching Twitter sentiment for: {collection_name}")
-    url = "https://api.twitter.com/2/tweets/search/recent"
-    query = f"{collection_name} NFT"
-    params = {
-        "query": query,
-        "max_results": 10,
-    }
-    headers = {"Authorization": f"Bearer {TWITTER_BEARER_TOKEN}"}
-    try:
-        response = session.get(url, params=params, headers=headers, timeout=10)
-        response.raise_for_status()
-        tweets = response.json().get("data", [])
-        mentions = len(tweets)
-        sentiment = (
-            np.mean([TextBlob(tweet["text"]).sentiment.polarity for tweet in tweets])
-            if tweets
-            else 0
-        )
-        print(f"Twitter mentions: {mentions}, sentiment: {sentiment:.4f}")
-        time.sleep(1)
-        return mentions, sentiment
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching Twitter data for {collection_name}: {e}")
-        time.sleep(1)
-        return 0, 0
-
-
-# Compute daily average prices with error handling for payment
-def compute_daily_averages(sales):
-    print(f"Computing daily averages for {len(sales)} sales")
-    if not sales:
-        print("No sales data available")
-        return pd.Series()
-    df = pd.DataFrame(sales)
-    df["timestamp"] = pd.to_datetime(df["event_timestamp"], unit="s")
-    df["date"] = df["timestamp"].dt.date
-    print(f"Unique dates: {df['date'].nunique()}")
-    df["price"] = df["payment"].apply(
-        lambda x: float(x["quantity"]) / (10 ** x["decimals"])
-        if isinstance(x, dict)
-        and "quantity" in x
-        and "decimals" in x
-        and x["token_address"].lower() == "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
-        else 0
+# 8. Enhanced Spam Detection
+def is_spam(nft_data, collection_meta):
+    metadata = nft_data.get("description", "").lower()
+    image = nft_data.get("image_url", "")
+    floor_price = nft_data.get("floor_price", 0)
+    safelist_status = collection_meta.get("safelist_status", "not_requested")
+    volume = collection_meta.get("stats", {}).get("total_volume", 0)
+    # Use Alchemy isSpam if available
+    is_spam_alchemy = (
+        nft_data.get("contract", {}).get("isSpam", False)
+        if isinstance(nft_data, dict) and "contract" in nft_data
+        else False
     )
-    daily_avg = df.groupby("date")["price"].mean()
-    print(f"Computed daily averages for {len(daily_avg)} days")
-    return daily_avg
-
-
-# Compute volatility
-def compute_volatility(daily_avg):
-    print("Computing volatility")
-    if len(daily_avg) > 1 and np.mean(daily_avg) > 0:
-        volatility = np.std(daily_avg) / np.mean(daily_avg)
-        print(f"Volatility computed: {volatility:.4f}")
-        return volatility
-    print("Warning: Insufficient data for volatility, using default 0.5")
-    return 0.5
-
-
-# Compute price trend
-def compute_price_trend(prices):
-    print("Computing price trend")
-    if len(prices) < 2:
-        print("Not enough data points for price trend")
-        return 0
-    x = np.arange(len(prices))
-    slope, _, _, _, _ = linregress(x, prices)
-    print(f"Price trend slope: {slope:.6f}")
-    return slope
-
-
-# Compute crypto correlation
-def compute_crypto_correlation(nft_prices, crypto_prices):
-    print("Computing crypto correlation")
-    if len(nft_prices) < 2 or len(crypto_prices) < 2:
-        print("Not enough data points for correlation")
-        return 0
-    min_len = min(len(nft_prices), len(crypto_prices))
-    corr = np.corrcoef(nft_prices[:min_len], crypto_prices[:min_len])[0, 1]
-    print(f"Crypto correlation: {corr:.4f}")
-    return corr
-
-
-# Compute risk score
-def compute_risk_score(features):
-    print("Computing risk score")
-    scaled_volatility = features["volatility"] * 100
-    scaled_norm_volume = 1 / (features["normalized_volume"] + 1e-6) * 10
-    scaled_collection_size = features["collection_size"] / 10000
-    scaled_rarity = 1 - features["rarity_score"]
-    scaled_price_trend = (features["price_trend"] + 1) * 50
-    scaled_crypto_correlation = features["crypto_correlation"] * 100
-    scaled_sentiment = (1 - features["sentiment_score"]) * 50
-    risk = (
-        0.30 * scaled_volatility
-        + 0.25 * scaled_norm_volume
-        + 0.15 * scaled_collection_size
-        + 0.15 * scaled_rarity
-        + 0.10 * scaled_price_trend
-        + 0.05 * scaled_crypto_correlation
-        + 0.05 * scaled_sentiment
+    return (
+        is_spam_alchemy  # Alchemy spam flag
+        or not metadata  # Empty description
+        or "http" not in image  # No valid image URL
+        or "spam" in metadata  # Keyword check
+        or floor_price == 0  # Zero floor price
+        or safelist_status == "not_requested"  # Not safelisted
+        or volume < 10  # Low trading volume
     )
-    risk = min(risk, 100.0)
-    print(f"Risk score computed: {risk:.2f}")
-    return risk
 
 
-# Main data collection and processing
-def collect_data():
-    print("Starting data collection")
-    with open(NFT_JSON_FILE, "r") as f:
-        nfts = json.load(f)
-    print(f"Loaded {len(nfts)} NFTs from {NFT_JSON_FILE}")
+# Apply spam filtering with collection metadata
+df["collection_meta"] = [
+    fetch_collection_metadata(nft["collection"]["slug"]) if "collection" in nft else {}
+    for nft in all_nfts_opensea + all_nfts_alchemy
+]
+df["is_spam"] = [
+    is_spam(nft, meta)
+    for nft, meta in zip(all_nfts_opensea + all_nfts_alchemy, df["collection_meta"])
+]
+df = df[df["is_spam"] == False].reset_index(drop=True)
 
-    collections = list(set(nft["collection"] for nft in nfts))
-    print(f"Found {len(collections)} unique collections")
-    cache = load_cache()
-    dataset = []
+# Clean up temporary column
+df = df.drop(columns=["collection_meta"])
 
-    eth_prices = fetch_crypto_prices("ethereum")
-    icp_prices = fetch_crypto_prices("internet-computer")
+# Save raw and cleaned data
+df.to_csv("nft_data_raw.csv", index=False)
+df.to_csv("nft_data_cleaned.csv", index=False)
 
-    for collection in collections:
-        print(f"Processing collection: {collection}")
-        stats = fetch_collection_stats(collection)[0]
-        sales = fetch_sale_events(collection)
-        daily_avg = compute_daily_averages(sales)
-        volatility = compute_volatility(daily_avg)
-        total_supply = stats.get("total_supply", 1000)
-        trading_volume = stats.get("thirty_day_volume", 0.0)
-        floor_price = stats.get("floor_price", 0.0)
-        normalized_volume = trading_volume / total_supply if total_supply > 0 else 0.0
-        mentions, sentiment = fetch_twitter_sentiment(collection)
-        floor_prices = cache.get(collection, {}).get(
-            "floor_prices",
-            [floor_price] * max((datetime.now() - datetime(2024, 7, 13)).days, 90),
-        )
-        price_trend = compute_price_trend(floor_prices)
-        crypto_correlation = compute_crypto_correlation(daily_avg.values, eth_prices)
+# 9. ML Model (Optional)
+if not df.empty and len(df) > 10:
+    # Preprocess numeric columns
+    numeric_features = [
+        "floor_price",
+        "balance",
+        "total_supply",
+        "twitter_sentiment_score",
+        "tweet_count_last_24h",
+        "avg_retweets_last_24h",
+        "avg_likes_last_24h",
+    ]
+    for col in numeric_features:
+        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
 
-        cache.setdefault(collection, {})
-        cache[collection]["floor_prices"] = floor_prices[-89:] + [floor_price]
-        save_cache(cache)
+    X = df[numeric_features].copy()
 
-        for nft in [n for n in nfts if n["collection"] == collection]:
-            rank = nft.get("rarity", {}).get("rank", total_supply // 2)
-            rarity_score = (
-                (total_supply - rank) / total_supply if total_supply > 0 else 0.5
-            )
-            features = {
-                "volatility": volatility,
-                "normalized_volume": normalized_volume,
-                "collection_size": total_supply,
-                "rarity_score": rarity_score,
-                "price_trend": price_trend,
-                "crypto_correlation": crypto_correlation,
-                "sentiment_score": sentiment,
-            }
-            risk_score = compute_risk_score(features)
-            dataset.append(
-                {
-                    "collection_id": collection,
-                    "token_id": nft["identifier"],
-                    "floor_price": floor_price,
-                    "trading_volume": trading_volume,
-                    "total_supply": total_supply,
-                    "rarity_rank": rank,
-                    "sale_prices": json.dumps(list(daily_avg.values)),
-                    "timestamps": json.dumps([str(d) for d in daily_avg.index]),
-                    "eth_prices": json.dumps(eth_prices),
-                    "icp_prices": json.dumps(icp_prices),
-                    "twitter_mentions": mentions,
-                    "volatility": volatility,
-                    "normalized_volume": normalized_volume,
-                    "collection_size": total_supply,
-                    "rarity_score": rarity_score,
-                    "price_trend": price_trend,
-                    "crypto_correlation": crypto_correlation,
-                    "sentiment_score": sentiment,
-                    "risk_score": risk_score,
-                }
-            )
-        print(
-            f"Processed {len([n for n in nfts if n['collection'] == collection])} NFTs for collection {collection}"
-        )
+    # Encode categorical variables
+    encoder = OneHotEncoder(sparse_output=False, drop="first")
+    categorical_cols = ["token_type", "collection_slug"]
+    for col in categorical_cols:
+        if col not in df.columns:
+            df[col] = ""
+    encoded_cols = encoder.fit_transform(df[categorical_cols])
+    encoded_df = pd.DataFrame(
+        encoded_cols, columns=encoder.get_feature_names_out(categorical_cols)
+    )
+    X = pd.concat([X, encoded_df], axis=1)
 
-    df = pd.DataFrame(dataset)
-    df.to_csv(CSV_FILE, index=False)
-    print(f"Saved {len(df)} records to {CSV_FILE}")
-    return df
+    # Train-test split and model
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, df["is_spam"], test_size=0.2, random_state=42
+    )
+    model = RandomForestClassifier(n_estimators=100, random_state=42)
+    model.fit(X_train, y_train)
+    accuracy = model.score(X_test, y_test)
+    print(f"Accuracy: {accuracy}")
+else:
+    print("Not enough non-spam data to train model.")
 
-
-# Main execution
-if __name__ == "__main__":
-    df = collect_data()
+print(
+    f"Collected {len(all_nfts_opensea) + len(all_nfts_alchemy)} NFTs, kept {len(df)} after spam filtering."
+)
