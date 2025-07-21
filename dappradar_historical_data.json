@@ -1,0 +1,4017 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "version": "1.11.0",
+        "title": "DappRadar API",
+        "termsOfService": "https://docs.google.com/document/d/1M9D97512Nr_sBuJ3uUHcanSlQm8fX9vExb9plJ_XsaY/edit?usp=sharing",
+        "contact": {
+            "email": "api@dappradar.com",
+            "url": "https://dappradar.com"
+        },
+        "x-logo": {
+            "url": "https://static.dappradar.com/website-fe-pr/public-assets/images/dappradar-logo-blue.png"
+        },
+        "description": "# Introduction\nThe DappRadar API can empower every business in the Web3 space with live, spam-free, quality crypto and blockchain data. An API can be a critical piece to building automated workflows that can get rid of time-consuming manual labor. Through the DappRadar API clients get access to clean blockchain data, covering DeFi, NFTs, gaming, and all kinds of other decentralized applications. DappRadar prides itself on supplying the cleanest and most comprehensive data sets, giving users and clients the best blockchain insights.\n\n## Docs Authentication\n  <p>For an optimal experience with the documentation, kindly insert your API KEY in the <b>Authentication</b> tab. This action will facilitate automatic authorization for all accessible endpoints, allowing you to seamlessly explore and interact with the functionalities using the TRY button directly within the documentation.</p>\n<div style=\"text-align:center;\">\n  <img src=\"https://dashboard-assets.dappradar.com/document/temp/image2_1705323506_d81c0f14506c6f360ca6069c00e342e3.png\" alt=\"Image Description\" style=\"display:block; margin:auto;\">\n</div>\n"
+    },
+    "tags": [
+        {
+            "name": "Changelog",
+            "description": "## Introduction\nDappRadar follows the [semantic versioning 2.0.0 schema](https://semver.org/).\n\nGiven a version number MAJOR.MINOR.PATCH, the versions are incremented the following:\n- MAJOR version: Incompatible API changes\n- MINOR version: Functionality in a backward compatible manner & fixes\n- PATCH version: Only backward-compatible bug fixes\n\nAdditional labels for pre-release and build metadata are available as extensions to the MAJOR.MINOR.PATCH format.\n\n## 1.11.0 (2023-10-16)\n\n### Features\n- Added sort by `tokenPrice`, `marketCap`, `adjustedTvl`, `tvl` and `marketCapTvl` on Get multiple DeFi dapps data endpoint.\n- Added time ranges (`24h`, `7d`, `30d`) support on Get multiple DeFi dapps data endpoint.\n- Adjusted historical dapps data access ranges, providing On-Demand users with 30 days, Startup Tier users with 90 days, and allowing Advanced Tier users to access unlimited historical data.\n\n### Fixes\n- The data inconsistency of volume percentage change on NFTs marketplaces was fixed.\n- The DeFi data inconsistency between website and the API data was fixed.\n\n\n## 1.10.1 (2023-08-16)\n\n### Fixes\n- The issue of returning top 100 results has been fixed in the Tops dapps endpoint.\n\n## 1.10.0 (2023-08-08)\n\n### Features\n- Added the main token associated with Dapp on single Dapp endpoint.\n- Added `tags` parameter on the responses of all Dapps list endpoints (multiple Dapps data, top Dapps, Dapp by search).\n- Added percentage change on all the `metrics` parameters.\n- Added `metrics` parameter on Dapp by search endpoint.\n- Added requested `chain` parameter on single dapp endpoint response.\n- Removed deprecated `users` parameter from `metrics` object on single dapp endpoint.\n\n\n## 1.9.2 (2023-07-03)\n\n### Fixes\n- `Get multiple aggregated metrics` endpoint has been fixed, as it was returning deprecated dappChainID instead of dappID for dapps when providing `chain` param.\n- `Get dapps by smart contracts` endpoint was deprecated. Use `Get dapps by search` endpoint instead, by providing smart contract as the `smartContract` param.\n\n\n## 1.9.1 (2023-06-07)\n\n### Fixes\n- Filtering by chain on search endpoint was improved. Multiple filter are available now.\n- NFT collections list filtering by smart contract was fixed.\n\n\n## 1.9.0 (2023-05-11)\n\n### Features\n- Added dapps search endpoint. This feature allows to get list of dapps searched by `smartContract`, `name` or exact `website`.\n- Added aggregated dapp metrics endpoint. This feature allows to get list of dapps with aggregated metrics (`uaw`, `transactions`, `balance`, `volume`) with value change differences in requested `range`. Endpoint also allows to filter by `chain`.\n\n\n## 1.8.0 (2023-04-14)\n\n### Features\n- Added DeFi supported chains endpoint.\n- Added DeFi dapps list endpoint. This feature allows to get list of dapps with DeFi metrics in 24h range. Endpoint allows to filter by `chain` and pagination filters. It also allows to sort by `tokenPrice`, `marketCap`, `adjustedTvl`, `tvl` and `marketCapTvl`.\n- Added single DeFi dapp endpoint. This feature allows to find a dapp with DeFi metrics in 24h range by providing `dappId`. Endpoint allows to filter by `chain` on multichain dapps.\n- Added more dapp data `description`, `fullDescription`, `logo`, `link`, `website`, `categories`, `socialLinks`, `tags` on single Dapp data endpoint.\n- Added metrics percentage change in range parameters `transactionsPercentageChange`, `uawPercentageChange`, `volumePercentageChange`, `balancePercentageChange` on single Dapp data endpoint, metrics parameter.\n\n### Fixes\n- Hidden (no longer supported) chains dapps where excluded from pagination results.\n\n\n## 1.7.1 (2023-04-05)\n### Fixes\n- Hidden (no longer supported) chains excluded from dapp list endpoints.\n- Error monitoring & logging has been improved.\n\n\n## 1.7.0 (2023-03-27)\n\n### Features\n- Added single NFT metadata endpoint. This feature allows to find a metadata of NFT by providing `chain`, collection `address` and `nftId`.\n- Added NFT metadata supported chains endpoint.\n- Added Token current price endpoint. This feature allows to get current ERC20 Token price by providing `chain` and smart contract `address`.\n- Added Token historical price endpoint. This feature allows to get historical ERC20 Token price in range by providing `chain`, smart contract `address` and `dateFrom` `dateTo` params for specific range.\n- Added Token information endpoint. This feature allows to get ERC20 Token static information by providing `chain` and smart contract `address`.\n- Added Token metrics endpoint. This feature allows to get ERC20 Token metrics (Volume|MarketCap|PriceChange) by providing `chain`, smart contract `address` and `range`. Currently only `24h` range is supported.\n- Added Tokens data supported chains endpoint.\n\n## 1.6.0 (2023-03-03)\n\n### Features\n- Added `socialLinks` parameter on all Dapps list endpoints.\n- Added `metrics` parameter on Top Dapps endpoint.\n- Added `address` query filter on NFT Collections list endpoint. This feature allows to find a collection by smart contract address.\n\n\n## 1.5.0 (2023-02-09)\n\n### Features\n- Added `estimatedPriceInCrypto` and `symbol` parameters single NFT item endpoint.\n- Added ML evaluated single NFT collection endpoint with `chain` filter.\n- Added NFT Marketplaces supported chains endpoint.\n- Added NFT Marketplaces list endpoint with `range`, `chain`, `sort`, `order` and pagination filters.\n- Added `chains`, `dappId`, `avgPrice`, `avgPricePercentageChange`, `volume`, `volumePercentageChange`, `sales`, `salesPercentageChange`, `marketCap`, `marketCapPercentageChange`, `floorPrice`, `floorPricePercentageChange`, `traders`, `tradersPercentageChange` and requested query parameters on NFT collections endpoint.\n- Added `range`, `chain`, `sort`, `order` filters on NFT collections endpoint.\n- Added `chains`, `dappId`, `logo`, `avgPricePercentageChange`, `volumePercentageChange`, `salesPercentageChange`, `marketCapPercentageChange`, `floorPricePercentageChange`, `tradersPercentageChange` and requested query parameters on NFT collection item endpoint.\n- Added `range`, `chain` filters on NFT collection item endpoint.\n\n\n## 1.4.0 (2023-01-19)\n\n### Features\n- Added `fullDescription` parameter on multiple Dapps data endpoint.\n- Added ML evaluated NFT collections list endpoint with `chain` and pagination filters.\n- Added ML evaluated single NFT item endpoint with `chain` filter.\n\n## 1.3.0 (2022-12-22)\n### Fixes\n- Renamed `users` dapp statistic metric to `uaw` (Unique Active Wallets). `user` parameter - deprecated.\n\n### Features\n- Added `website` parameter on multiple Dapps data endpoint.\n- Added Get Dapps by smart contract endpoint with `chain` and pagination filters.\n\n\n## 1.2.0 (2022-12-08)\n### Fixes\n- Resynced `volume` values on single Dapp History data endpoint.\n\n### Features\n- Added `balance` parameter on single Dapp data endpoint.\n- Added Top dapps endpoint by `volume|users|transactions|balance` with `range`, `category`, `chain` and `top` filters.\n\n\n## 1.1.1 (2022-11-25)\n### Fixes\n- Resolved pagination issue on multiple NFTs collections endpoint.\n- Resynced `volume` values on single Dapp data endpoint.\n- Resolved missing collections issue on multiple NFTs collections endpoint using filter by chain.\n- Resolved multichain dapps filtering by chain issue on multiple Dapps data endpoint.\n\n***\n\n## 1.1.0 (2022-11-11)\n### Fixes\n- Resolved issue with `minimumDateFrom` parameter value by requested chain.\n\n### Features\n- Added `description` parameter on multiple Dapps data endpoint.\n- Added `firstTransactionDate` parameter on single Dapp data endpoint. Parameter can be used to set minimum query parameter `dateFrom` value on Dapp historical endpoint.\n\n***\n\n## 1.0.0 (2022-10-20)\nDocs 1.0.0 release!\n\n***\n\n\n\n"
+        },
+        {
+            "name": "Dapps",
+            "description": "Through the DappRadar API you can get access to the widest selection of dapps from over 50 indexed blockchains and that means, more than 12000 dapps. A decentralized application is an app that runs on a decentralized network. It is similar to a regular app that you would find on your phone or computer, but it is not centrally controlled by any one person or entity. Why? Because Dapps operate from a peer-to-peer network and not from a single server."
+        },
+        {
+            "name": "NFTs",
+            "description": "Through the DappRadar API you can get access to more than 1,900 NFT Collections.\nNFT stands for non-fungible token. It is a type of digital asset backed by blockchain that, unlike cryptocurrencies, are unique. They can represent ownership of digital or physical items, such as art, virtual land, or collectibles.\n\nNon-Fungible Tokens (or NFTs for short) are unique digital items that are issued on a blockchain such as Ethereum or Solana. In many ways, they hold similar qualities to items in the real world.\n"
+        }
+    ],
+    "servers": [
+        {
+            "url": "https://apis.dappradar.com/v2/"
+        }
+    ],
+    "paths": {
+        "/dapps/chains": {
+            "get": {
+                "tags": [
+                    "Dapps"
+                ],
+                "summary": "Get supported chains",
+                "description": "This endpoint returns all supported chains in the dapp rankings. https://dappradar.com/rankings\n",
+                "operationId": "getDappsProtocols",
+                "security": [
+                    {
+                        "X-API-KEY": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DappProtocolsList"
+                                },
+                                "example": {
+                                    "success": true,
+                                    "chains": [
+                                        "ethereum",
+                                        "polygon"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "$ref": "#/components/responses/Forbidden"
+                    }
+                }
+            }
+        },
+        "/dapps/categories": {
+            "get": {
+                "tags": [
+                    "Dapps"
+                ],
+                "summary": "Get supported categories",
+                "description": "This endpoint returns all supported categories in the dapp rankings. https://dappradar.com/rankings\n",
+                "operationId": "getDappsCategories",
+                "security": [
+                    {
+                        "X-API-KEY": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DappCategoriesList"
+                                },
+                                "example": {
+                                    "success": true,
+                                    "categories": [
+                                        "games",
+                                        "defi"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "$ref": "#/components/responses/Forbidden"
+                    }
+                }
+            }
+        },
+        "/dapps": {
+            "get": {
+                "tags": [
+                    "Dapps"
+                ],
+                "summary": "Get multiple Dapps data",
+                "description": "This endpoint returns a list of multiple dapps and pages from a certain `chain`, `specific page` and expected `results per page`.\n",
+                "operationId": "getDapps",
+                "parameters": [
+                    {
+                        "name": "chain",
+                        "in": "query",
+                        "description": "Provide a chain if you need a specific chain dapps",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Provide a page if you need a specific page dapps",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "resultsPerPage",
+                        "in": "query",
+                        "description": "Provide a number of expected results per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "enum": [
+                                10,
+                                25,
+                                50
+                            ]
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "X-API-KEY": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DappList"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "500": {
+                        "description": "Something went wrong",
+                        "$ref": "#/components/responses/Problem"
+                    }
+                }
+            }
+        },
+        "/dapps/{dappId}": {
+            "get": {
+                "tags": [
+                    "Dapps"
+                ],
+                "summary": "Get single Dapp data",
+                "description": "This endpoint provides users, transactions, volume, balance for a specific dapp. Input is required as the dappId, timeframe (24 hours, 7d or 30d) and chains for data retrieval. The dappId can be sourced from the paginated list or the dapp's about page. ",
+                "operationId": "getDappItem",
+                "parameters": [
+                    {
+                        "name": "dappId",
+                        "in": "path",
+                        "description": "Provide a dapp ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "chain",
+                        "in": "query",
+                        "description": "Provide a chain if you need only specific chain data (Multichain dapps only)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "range",
+                        "in": "query",
+                        "description": "Select a range",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "24h",
+                                "7d",
+                                "30d"
+                            ]
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "X-API-KEY": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DappItem"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "description": "Something went wrong",
+                        "$ref": "#/components/responses/Problem"
+                    }
+                }
+            }
+        },
+        "/dapps/top/{metric}": {
+            "get": {
+                "tags": [
+                    "Dapps"
+                ],
+                "summary": "Get top Dapps",
+                "description": "This endpoint returns the top dapps by providing the required `metric` (UAW, volume or transactions) as well as the specified `chain`, `category`, `range` and how many `top` results are expected.",
+                "operationId": "getTopDapps",
+                "parameters": [
+                    {
+                        "name": "metric",
+                        "in": "path",
+                        "description": "Select a metric",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "balance",
+                                "transactions",
+                                "uaw",
+                                "volume"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "chain",
+                        "in": "query",
+                        "description": "Provide a chain if you need a specific chain dapps",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "description": "Provide a category if you need a specific category dapps",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "range",
+                        "in": "query",
+                        "description": "Select a range",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "24h",
+                                "7d",
+                                "30d"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "top",
+                        "in": "query",
+                        "description": "Provide a number of expected top dapps",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "enum": [
+                                10,
+                                25,
+                                50,
+                                100
+                            ]
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "X-API-KEY": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TopDappList"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "500": {
+                        "description": "Something went wrong",
+                        "$ref": "#/components/responses/Problem"
+                    }
+                }
+            }
+        },
+        "/dapps/{dappId}/history/{metric}": {
+            "get": {
+                "tags": [
+                    "Dapps"
+                ],
+                "summary": "Get historical Dapp data",
+                "description": "This endpoint delivers historical data for a given dapp. The required inputs are the `dappId` and the `metric`. You also need to specify the `chain` and a time range (UTC), between `dateFrom` and `dateTo`, for which the transaction count is to be calculated.",
+                "operationId": "getDappItemHistoricalTransactions",
+                "parameters": [
+                    {
+                        "name": "metric",
+                        "in": "path",
+                        "description": "Select a metric",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "transactions",
+                                "uaw",
+                                "volume"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "dappId",
+                        "in": "path",
+                        "description": "Provide a dapp ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "chain",
+                        "in": "query",
+                        "description": "Provide a chain if you need only specific chain data (Multichain dapps only)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "dateFrom",
+                        "in": "query",
+                        "description": "Select date from (yyyy-MM-dd)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "dateTo",
+                        "in": "query",
+                        "description": "Select date to (yyyy-MM-dd) (maximum range - 30 days)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "X-API-KEY": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DappItemHistory"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "description": "Something went wrong",
+                        "$ref": "#/components/responses/Problem"
+                    }
+                }
+            }
+        },
+        "/dapps/search": {
+            "get": {
+                "tags": [
+                    "Dapps"
+                ],
+                "summary": "Get Dapps by search",
+                "description": "This endpoint retrieves information about a dapp such as the website, logo, and metrics. The parameters for the search `smartContract`, `name` or exact `website`. ",
+                "operationId": "getDappsBySearch",
+                "parameters": [
+                    {
+                        "name": "chain",
+                        "in": "query",
+                        "description": "Provide a chain if you need a specific chain dapps",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "smartContract",
+                        "in": "query",
+                        "description": "Search dapps by a smart contract",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "website",
+                        "in": "query",
+                        "description": "Search dapps by an exact website",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "description": "Search dapps by name/title",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Provide a page if you need a specific page dapps",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "resultsPerPage",
+                        "in": "query",
+                        "description": "Provide a number of expected results per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "enum": [
+                                10,
+                                25,
+                                50
+                            ]
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "X-API-KEY": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DappBySearchList"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "500": {
+                        "description": "Something went wrong",
+                        "$ref": "#/components/responses/Problem"
+                    }
+                }
+            }
+        },
+        "/dapps/aggregated/metrics": {
+            "get": {
+                "tags": [
+                    "Dapps"
+                ],
+                "summary": "Get multiple aggregated metrics",
+                "description": "This endpoint allows to get list of dapps with aggregated metrics (`uaw`, `transactions`, `balance`, `volume`) and their procentual value change in requested the requested `range`. It also allows to filter by `chain`.\n",
+                "operationId": "getDappAggregatedMetricsList",
+                "parameters": [
+                    {
+                        "name": "chain",
+                        "in": "query",
+                        "description": "Provide a chain if you need a specific chain dapps",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "range",
+                        "in": "query",
+                        "description": "Select a range",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "24h",
+                                "7d",
+                                "30d"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Provide a page if you need a specific page dapps",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "resultsPerPage",
+                        "in": "query",
+                        "description": "Provide a number of expected results per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "enum": [
+                                10,
+                                25,
+                                50
+                            ]
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "X-API-KEY": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DappAggregatedMetricsList"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "500": {
+                        "description": "Something went wrong",
+                        "$ref": "#/components/responses/Problem"
+                    }
+                }
+            }
+        },
+        "/nfts/collections/chains": {
+            "get": {
+                "tags": [
+                    "NFTs"
+                ],
+                "summary": "Get supported collections chains",
+                "description": "This endpoint returns all chains that are supported in the NFT page. https://dappradar.com/nft\n",
+                "operationId": "getCollectionsProtocols",
+                "security": [
+                    {
+                        "X-API-KEY": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DappProtocolsList"
+                                },
+                                "example": {
+                                    "success": true,
+                                    "chains": [
+                                        "ethereum",
+                                        "polygon"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "$ref": "#/components/responses/Forbidden"
+                    }
+                }
+            }
+        },
+        "/nfts/collections": {
+            "get": {
+                "tags": [
+                    "NFTs"
+                ],
+                "summary": "Get multiple NFT collections data",
+                "description": "This endpoint returns a list of multiple NFT collections paginated from a certain `chain`, `paginated page` and`results per page`.",
+                "operationId": "getCollections",
+                "parameters": [
+                    {
+                        "name": "range",
+                        "in": "query",
+                        "description": "Provide a range if you need metrics of specific range",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "15min",
+                                "30min",
+                                "1h",
+                                "24h",
+                                "7d",
+                                "30d",
+                                "all"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Provide a sort if you need to order results by specific variable value",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "avgPrice",
+                                "traders",
+                                "volume",
+                                "sales",
+                                "marketCap",
+                                "floorPrice"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "description": "Provide a sorting order",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "chain",
+                        "in": "query",
+                        "description": "Provide a chain if you need a specific chain NFT collections",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Provide a page if you need a specific page collections",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "resultsPerPage",
+                        "in": "query",
+                        "description": "Provide a number of expected results per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "enum": [
+                                10,
+                                25,
+                                50
+                            ]
+                        }
+                    },
+                    {
+                        "name": "address",
+                        "in": "query",
+                        "description": "Provide a collection smart contract address",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "X-API-KEY": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CollectionList"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "500": {
+                        "description": "Something went wrong",
+                        "$ref": "#/components/responses/Problem"
+                    }
+                }
+            }
+        },
+        "/nfts/collections/{collectionId}": {
+            "get": {
+                "tags": [
+                    "NFTs"
+                ],
+                "summary": "Get single NFT Collection data",
+                "description": "This endpoint provides volume, traders, sales, floor price, avgerage price, marketcap for a single listed NFT collection. Required parameters are `collectionId` and a UTC time range. Current NFT collections belong to a single chain, so no `chain` parameters are necessary.",
+                "operationId": "getCollectionItem",
+                "parameters": [
+                    {
+                        "name": "collectionId",
+                        "in": "path",
+                        "description": "Provide a collection ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "chain",
+                        "in": "query",
+                        "description": "Provide a chain if you need a specific chain NFT collection",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "range",
+                        "in": "query",
+                        "description": "Select a range",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "15min",
+                                "30min",
+                                "1h",
+                                "24h",
+                                "7d",
+                                "30d",
+                                "all"
+                            ]
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "X-API-KEY": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CollectionItem"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "description": "Something went wrong",
+                        "$ref": "#/components/responses/Problem"
+                    }
+                }
+            }
+        },
+        "/nfts/marketplaces/chains": {
+            "get": {
+                "tags": [
+                    "NFTs"
+                ],
+                "summary": "Get supported marketplaces chains",
+                "description": "This endpoint returns all chains that are supported in the NFT marketplaces page. https://dappradar.com/nft/marketplaces\n",
+                "operationId": "getMarketplacesChains",
+                "security": [
+                    {
+                        "X-API-KEY": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DappProtocolsList"
+                                },
+                                "example": {
+                                    "success": true,
+                                    "chains": [
+                                        "ethereum",
+                                        "polygon"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "$ref": "#/components/responses/Forbidden"
+                    }
+                }
+            }
+        },
+        "/nfts/marketplaces": {
+            "get": {
+                "tags": [
+                    "NFTs"
+                ],
+                "summary": "Get multiple NFT marketplaces data",
+                "description": "This endpoint returns a list of multiple NFT collections paginated from a certain `chain`, `paginated page` and`results per page`.",
+                "operationId": "getMarketplaces",
+                "parameters": [
+                    {
+                        "name": "chain",
+                        "in": "query",
+                        "description": "Provide a chain if you need a specific chain NFT collections",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "range",
+                        "in": "query",
+                        "description": "Provide a range if you need metrics of specific range",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "1h",
+                                "24h",
+                                "7d",
+                                "30d",
+                                "all"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Provide a sort if you need to order results by specific variable value",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "avgPrice",
+                                "traders",
+                                "volume"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "description": "Provide a sorting order",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Provide a page if you need a specific page collections",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "resultsPerPage",
+                        "in": "query",
+                        "description": "Provide a number of expected results per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "enum": [
+                                10,
+                                25,
+                                50
+                            ]
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "X-API-KEY": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MarketplacesList"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "500": {
+                        "description": "Something went wrong",
+                        "$ref": "#/components/responses/Problem"
+                    }
+                }
+            }
+        },
+        "/nfts/value-estimator/chains": {
+            "get": {
+                "tags": [
+                    "NFTs"
+                ],
+                "summary": "Get supported chains of NFT value estimator",
+                "description": "This endpoint returns all chains that supports estimated NFT values.\n",
+                "operationId": "getEstimatedNftsChains",
+                "security": [
+                    {
+                        "X-API-KEY": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DappProtocolsList"
+                                },
+                                "example": {
+                                    "success": true,
+                                    "chains": [
+                                        "ethereum",
+                                        "polygon"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "$ref": "#/components/responses/Forbidden"
+                    }
+                }
+            }
+        },
+        "/nfts/value-estimator/collections": {
+            "get": {
+                "tags": [
+                    "NFTs"
+                ],
+                "summary": "Get supported NFT value estimator collections",
+                "description": "This endpoint returns multiple NFT collections with estimated prices support from a certain `chain`, `specific page` and expected `results per page`.\n",
+                "operationId": "getEstimatedCollections",
+                "parameters": [
+                    {
+                        "name": "chain",
+                        "in": "query",
+                        "description": "Provide a chain if you need a specific chain estimated NFT collections",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Provide a page if you need a specific page estimated collections",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "resultsPerPage",
+                        "in": "query",
+                        "description": "Provide a number of expected results per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "enum": [
+                                10,
+                                25,
+                                50
+                            ]
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "X-API-KEY": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EstimatedCollectionList"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "500": {
+                        "description": "Something went wrong",
+                        "$ref": "#/components/responses/Problem"
+                    }
+                }
+            }
+        },
+        "/nfts/value-estimator/{collectionId}": {
+            "get": {
+                "tags": [
+                    "NFTs"
+                ],
+                "summary": "Get estimated NFT collection value",
+                "description": "This endpoint returns estimated collection price - the sum of all estimated NFT values within the collection. You need to input the `collectionId`. If the estimated collection is multichain, you can provide a `chain`.\n",
+                "operationId": "getEstimatedNftCollection",
+                "parameters": [
+                    {
+                        "name": "collectionId",
+                        "in": "path",
+                        "description": "Provide a collection ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "chain",
+                        "in": "query",
+                        "description": "Provide a chain if you need a specific chain estimations",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "X-API-KEY": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EstimatedNftCollectionResults"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "description": "Something went wrong",
+                        "$ref": "#/components/responses/Problem"
+                    }
+                }
+            }
+        },
+        "/nfts/value-estimator/{collectionId}/{nftId}": {
+            "get": {
+                "tags": [
+                    "NFTs"
+                ],
+                "summary": "Get estimated NFT item value",
+                "description": "This endpoint returns estimated NFT price from an estimated NFT collection. You need to input the `collectionId` as well as the `nftId`. If the estimated collection is multichain, you can provide a `chain`\n",
+                "operationId": "getEstimatedNftItem",
+                "parameters": [
+                    {
+                        "name": "collectionId",
+                        "in": "path",
+                        "description": "Provide a collection ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "nftId",
+                        "in": "path",
+                        "description": "Provide a NFT ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "chain",
+                        "in": "query",
+                        "description": "Provide a chain if you need a specific chain estimated NFT collections",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "X-API-KEY": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EstimatedNftResults"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "description": "Something went wrong",
+                        "$ref": "#/components/responses/Problem"
+                    }
+                }
+            }
+        },
+        "/nfts/metadata/chains": {
+            "get": {
+                "tags": [
+                    "NFTs"
+                ],
+                "summary": "Get supported NFT metadata chains",
+                "description": "This endpoint returns all chains that supports NFT metadata\n",
+                "operationId": "getMetadataChains",
+                "security": [
+                    {
+                        "X-API-KEY": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DappProtocolsList"
+                                },
+                                "example": {
+                                    "success": true,
+                                    "chains": [
+                                        "ethereum",
+                                        "polygon"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "$ref": "#/components/responses/Forbidden"
+                    }
+                }
+            }
+        },
+        "/nfts/metadata/{chain}/{address}/{nftId}": {
+            "get": {
+                "tags": [
+                    "NFTs"
+                ],
+                "summary": "Get metadata of specific NFT",
+                "description": "This endpoint returns metadata of specific NFT. It takes `chain` as an parameter as well as the `collectionId` and `nftId`.\n",
+                "operationId": "getMetadataNftItem",
+                "parameters": [
+                    {
+                        "name": "chain",
+                        "in": "path",
+                        "description": "Provide a chain",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "address",
+                        "in": "path",
+                        "description": "Provide a collection smart contract address",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "nftId",
+                        "in": "path",
+                        "description": "Provide a NFT ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "X-API-KEY": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MetadataNftItemResults"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "description": "Something went wrong",
+                        "$ref": "#/components/responses/Problem"
+                    }
+                }
+            }
+        },
+        "/tokens/chains": {
+            "get": {
+                "tags": [
+                    "Tokens"
+                ],
+                "summary": "Get supported tokens chains",
+                "description": "This endpoint returns all chains that support Tokens\n",
+                "operationId": "getTokensChains",
+                "security": [
+                    {
+                        "X-API-KEY": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DappProtocolsList"
+                                },
+                                "example": {
+                                    "success": true,
+                                    "chains": [
+                                        "ethereum",
+                                        "polygon"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "$ref": "#/components/responses/Forbidden"
+                    }
+                }
+            }
+        },
+        "/tokens/price/{chain}/{address}": {
+            "get": {
+                "tags": [
+                    "Tokens"
+                ],
+                "summary": "Get current token price",
+                "description": "This endpoint retrieves the current price of a token in USD. It requires the `chain` and the token `address` as input parameters.",
+                "operationId": "getTokenPrice",
+                "parameters": [
+                    {
+                        "name": "chain",
+                        "in": "path",
+                        "description": "Provide a token chain",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "address",
+                        "in": "path",
+                        "description": "Provide a token smart contract address",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "X-API-KEY": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TokenPriceResults"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "description": "Something went wrong",
+                        "$ref": "#/components/responses/Problem"
+                    }
+                }
+            }
+        },
+        "/tokens/historical-price/{chain}/{address}": {
+            "get": {
+                "tags": [
+                    "Tokens"
+                ],
+                "summary": "Get historical token prices",
+                "description": "This endpoint fetches historical prices of a token in USD. Parameters required include the `chain` and token `address`. To specify a certain time range, use the `dateFrom` and `dateTo` query parameters.",
+                "operationId": "getHistoricalTokenPrice",
+                "parameters": [
+                    {
+                        "name": "chain",
+                        "in": "path",
+                        "description": "Provide a token chain",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "address",
+                        "in": "path",
+                        "description": "Provide a token smart contract address",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "dateFrom",
+                        "in": "query",
+                        "description": "Select date from (yyyy-MM-dd)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "dateTo",
+                        "in": "query",
+                        "description": "Select date to (yyyy-MM-dd)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "X-API-KEY": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HistoricalTokenPriceResults"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "description": "Something went wrong",
+                        "$ref": "#/components/responses/Problem"
+                    }
+                }
+            }
+        },
+        "/tokens/info/{chain}/{address}": {
+            "get": {
+                "tags": [
+                    "Tokens"
+                ],
+                "summary": "Get token static information",
+                "description": "This endpoint returns current Token static information. It takes the `chain` as well as the token `address` as parameters.",
+                "operationId": "getTokenInfo",
+                "parameters": [
+                    {
+                        "name": "chain",
+                        "in": "path",
+                        "description": "Provide a token chain",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "address",
+                        "in": "path",
+                        "description": "Provide a token smart contract address",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "X-API-KEY": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TokenInfoResults"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "description": "Something went wrong",
+                        "$ref": "#/components/responses/Problem"
+                    }
+                }
+            }
+        },
+        "/tokens/metrics/{chain}/{address}": {
+            "get": {
+                "tags": [
+                    "Tokens"
+                ],
+                "summary": "Get token metrics",
+                "description": "This endpoint returns Token metrics in 24h range. You need to input the `chain` as well as the token `address`. \n",
+                "operationId": "getTokenMetrics",
+                "parameters": [
+                    {
+                        "name": "chain",
+                        "in": "path",
+                        "description": "Provide a token chain",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "address",
+                        "in": "path",
+                        "description": "Provide a token smart contract address",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "range",
+                        "in": "query",
+                        "description": "Select a range",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "24h"
+                            ]
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "X-API-KEY": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TokenMetricsResults"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "description": "Something went wrong",
+                        "$ref": "#/components/responses/Problem"
+                    }
+                }
+            }
+        },
+        "/defi/chains": {
+            "get": {
+                "tags": [
+                    "DeFi"
+                ],
+                "summary": "Get supported DeFi chains",
+                "description": "This endpoint returns all chains that support DeFi\n",
+                "operationId": "getDeFiChains",
+                "security": [
+                    {
+                        "X-API-KEY": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DappProtocolsList"
+                                },
+                                "example": {
+                                    "success": true,
+                                    "chains": [
+                                        "ethereum",
+                                        "polygon"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "$ref": "#/components/responses/Forbidden"
+                    }
+                }
+            }
+        },
+        "/defi/dapps": {
+            "get": {
+                "tags": [
+                    "DeFi"
+                ],
+                "summary": "Get multiple DeFi dapps data",
+                "description": "This endpoint returns a list of multiple DeFi dapps and pages from a certain `chain`, specific `page` and expected `results per page`. It also allows to sort by `tokenPrice`, `marketCap`, `adjustedTvl`, `tvl` and `marketCapTvl`\n",
+                "operationId": "getDefiDappsList",
+                "parameters": [
+                    {
+                        "name": "chain",
+                        "in": "query",
+                        "description": "Provide a chain if you need a specific chain DeFi dapps",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "range",
+                        "in": "query",
+                        "description": "Select a range",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "24h",
+                                "7d",
+                                "30d"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Provide a sort if you need to order results by specific variable value",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "tokenPrice",
+                                "marketCap",
+                                "adjustedTvl",
+                                "tvl",
+                                "marketCapTvl"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "description": "Provide a sorting order",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Provide a page if you need a specific page DeFi dapps",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "resultsPerPage",
+                        "in": "query",
+                        "description": "Provide a number of expected results per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "enum": [
+                                10,
+                                25,
+                                50
+                            ]
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "X-API-KEY": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeFiDappsList"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "500": {
+                        "description": "Something went wrong",
+                        "$ref": "#/components/responses/Problem"
+                    }
+                }
+            }
+        },
+        "/defi/dapps/{dappId}": {
+            "get": {
+                "tags": [
+                    "DeFi"
+                ],
+                "summary": "Get single DeFi dapp data",
+                "description": "This endpoint returns DeFi metrics (TVL, aTVL, CAP). You need to input the `dappId`, as well as `chain` (optional) as parameters. ",
+                "operationId": "getDeFiDappItem",
+                "parameters": [
+                    {
+                        "name": "dappId",
+                        "in": "path",
+                        "description": "Provide a dapp ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "chain",
+                        "in": "query",
+                        "description": "Provide a chain if you need a specific chain dapps",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "range",
+                        "in": "query",
+                        "description": "Select a range",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "24h",
+                                "7d",
+                                "30d"
+                            ]
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "X-API-KEY": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeFiDappItemResults"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "500": {
+                        "description": "Something went wrong",
+                        "$ref": "#/components/responses/Problem"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "X-API-KEY": {
+                "description": "Get your API key from our <a href=\"https://apis-portal.dappradar.com/\" target=\"_blank\">API Portal</a>\n",
+                "name": "X-API-KEY",
+                "type": "apiKey",
+                "in": "header"
+            }
+        },
+        "schemas": {
+            "DappProtocolsList": {
+                "type": "object",
+                "title": "Chains",
+                "properties": {
+                    "success": {
+                        "description": "Status of response",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "chains": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "title": "Chains",
+                            "example": [
+                                "ethereum",
+                                "polygon"
+                            ]
+                        }
+                    }
+                }
+            },
+            "Forbidden": {
+                "type": "object",
+                "additionalProperties": false,
+                "minProperties": 1,
+                "description": "The Problem Details JSON Object.",
+                "properties": {
+                    "requestId": {
+                        "type": "string",
+                        "description": "Failed request ID",
+                        "example": "dzLWV1LXdlc3QtMQ"
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "The cause of error",
+                        "example": "Forbidden"
+                    }
+                }
+            },
+            "DappCategoriesList": {
+                "type": "object",
+                "title": "Categories",
+                "properties": {
+                    "success": {
+                        "description": "Status of response",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "categories": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "title": "Categories",
+                            "example": [
+                                "games",
+                                "defi"
+                            ]
+                        }
+                    }
+                }
+            },
+            "SocialLinksListItem": {
+                "type": "object",
+                "title": "Social link",
+                "properties": {
+                    "title": {
+                        "description": "Social link title",
+                        "type": "string",
+                        "example": "discord"
+                    },
+                    "url": {
+                        "description": "Social link url",
+                        "type": "string",
+                        "example": "https://discord.gg/apeswap"
+                    },
+                    "type": {
+                        "description": "Social link type",
+                        "type": "string",
+                        "example": "discord"
+                    }
+                }
+            },
+            "TagsListItem": {
+                "type": "object",
+                "title": "Tag",
+                "properties": {
+                    "id": {
+                        "description": "Tag ID",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "description": "Tag name",
+                        "type": "string",
+                        "example": "DeFi"
+                    },
+                    "slug": {
+                        "description": "Tag slug",
+                        "type": "string",
+                        "example": "defi"
+                    }
+                }
+            },
+            "DappListItem": {
+                "type": "object",
+                "title": "Dapps",
+                "properties": {
+                    "dappId": {
+                        "description": "Dapp unique identifier (ID)",
+                        "type": "integer",
+                        "example": 1852
+                    },
+                    "name": {
+                        "description": "Dapp title/name",
+                        "type": "string",
+                        "example": "CryptoKitties"
+                    },
+                    "description": {
+                        "description": "Dapp short description",
+                        "type": "string",
+                        "example": "In CryptoKitties, users collect and breed",
+                        "nullable": true
+                    },
+                    "fullDescription": {
+                        "description": "Dapp full description",
+                        "type": "string",
+                        "example": "In CryptoKitties, users collect and breed oh-so-adorable creatures that we call CryptoKitties! Each kitty has a unique genome that defines its appearance and traits. Players can breed their kitties to create new furry friends and unlock rare cattributes.",
+                        "nullable": true
+                    },
+                    "logo": {
+                        "description": "Dapp logo",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "link": {
+                        "description": "Dapp link to DappRadar single dapp page",
+                        "type": "string",
+                        "example": "https://dappradar.com/ethereum/games/cryptokitties"
+                    },
+                    "website": {
+                        "description": "Dapp link to original website",
+                        "type": "string",
+                        "example": "https://www.cryptokitties.co"
+                    },
+                    "chains": {
+                        "description": "Array of dapp supported chains. If Dapp contains more than one chain, it is multichain dapp.",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "title": "Chains",
+                            "example": "ethereum"
+                        }
+                    },
+                    "categories": {
+                        "description": "Dapp categories",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "title": "Categories",
+                            "example": "games"
+                        }
+                    },
+                    "socialLinks": {
+                        "description": "Dapp social links",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SocialLinksListItem"
+                        }
+                    },
+                    "tags": {
+                        "description": "Array of dapp tags.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TagsListItem"
+                        }
+                    }
+                }
+            },
+            "DappList": {
+                "type": "object",
+                "title": "Dapps",
+                "properties": {
+                    "success": {
+                        "description": "Status of response",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DappListItem"
+                        }
+                    },
+                    "page": {
+                        "description": "Current page",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "pageCount": {
+                        "description": "Total amount of pages",
+                        "type": "integer",
+                        "example": 486
+                    },
+                    "resultCount": {
+                        "description": "Total amount of results",
+                        "type": "integer",
+                        "example": 12134
+                    },
+                    "resultsPerPage": {
+                        "description": "Results amount per page",
+                        "type": "integer",
+                        "example": 25
+                    }
+                }
+            },
+            "BadRequestItem": {
+                "type": "object",
+                "title": "Errors",
+                "properties": {
+                    "reason": {
+                        "description": "Bad request reason",
+                        "type": "string",
+                        "example": "InvalidQuery"
+                    },
+                    "message": {
+                        "description": "Bad request message",
+                        "type": "string",
+                        "example": "Validation failure: Chain not available."
+                    },
+                    "value": {
+                        "description": "Requested value",
+                        "type": "string",
+                        "example": "eth"
+                    },
+                    "validValues": {
+                        "description": "Example of valid values",
+                        "type": "string",
+                        "example": [
+                            "ethereum",
+                            "bsc"
+                        ]
+                    }
+                }
+            },
+            "BadRequest": {
+                "type": "object",
+                "additionalProperties": false,
+                "minProperties": 1,
+                "description": "The Problem Details JSON Object.",
+                "properties": {
+                    "success": {
+                        "description": "Status of response",
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "message": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/BadRequestItem"
+                        }
+                    }
+                }
+            },
+            "Problem": {
+                "type": "object",
+                "additionalProperties": false,
+                "minProperties": 1,
+                "description": "The Problem Details JSON Object.",
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": false,
+                        "description": "The status of response success.",
+                        "format": "uri"
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "A short, human-readable summary of the problem type."
+                    }
+                }
+            },
+            "TokensListItem": {
+                "type": "object",
+                "title": "Token",
+                "properties": {
+                    "logo": {
+                        "description": "Token logo",
+                        "type": "string",
+                        "example": "https://token-repository.dappradar.com/tokens?protocol=ethereum&contract=0x5a98fcbea516cf06857215779fd812ca3bef1b32&file=logo.png"
+                    },
+                    "symbol": {
+                        "description": "Token symbol",
+                        "type": "string",
+                        "example": "ldo"
+                    },
+                    "smartContract": {
+                        "description": "Token smart contract",
+                        "type": "string",
+                        "example": 1.8037405964354346e+47
+                    },
+                    "price": {
+                        "description": "Current token price (USD)",
+                        "type": "number",
+                        "example": 1.86
+                    },
+                    "pricePercentageChange": {
+                        "description": "Percentage of token price change in 24 hours",
+                        "type": "number",
+                        "example": 0
+                    }
+                }
+            },
+            "DappItemDappMetrics": {
+                "type": "object",
+                "title": "Metrics",
+                "properties": {
+                    "transactions": {
+                        "description": "Transactions count in requested range",
+                        "type": "integer",
+                        "example": 65483
+                    },
+                    "transactionsPercentageChange": {
+                        "description": "Transactions percentage change in requested range",
+                        "type": "number",
+                        "example": 65483
+                    },
+                    "uaw": {
+                        "description": "Unique users count in requested range",
+                        "type": "integer",
+                        "example": 27448
+                    },
+                    "uawPercentageChange": {
+                        "description": "Unique users percentage change in requested range",
+                        "type": "integer",
+                        "example": 27448
+                    },
+                    "volume": {
+                        "description": "Total volume (USD) in requested range",
+                        "type": "number",
+                        "example": 11219457.28
+                    },
+                    "volumePercentageChange": {
+                        "description": "Total volume (USD) percentage change in requested range",
+                        "type": "number",
+                        "example": 11219457.28
+                    },
+                    "balance": {
+                        "description": "Total balance",
+                        "type": "number",
+                        "example": 87319477.8
+                    },
+                    "balancePercentageChange": {
+                        "description": "Total balance percentage change",
+                        "type": "number",
+                        "example": 87319477.8
+                    }
+                }
+            },
+            "DappItemDapp": {
+                "type": "object",
+                "title": "Dapp",
+                "properties": {
+                    "dappId": {
+                        "description": "Dapp unique identifier (ID)",
+                        "type": "integer",
+                        "example": 1852
+                    },
+                    "name": {
+                        "description": "Dapp title/name",
+                        "type": "string",
+                        "example": "CryptoKitties"
+                    },
+                    "description": {
+                        "description": "Dapp short description",
+                        "type": "string",
+                        "example": "In CryptoKitties, users collect and breed",
+                        "nullable": true
+                    },
+                    "fullDescription": {
+                        "description": "Dapp full description",
+                        "type": "string",
+                        "example": "In CryptoKitties, users collect and breed oh-so-adorable creatures that we call CryptoKitties! Each kitty has a unique genome that defines its appearance and traits. Players can breed their kitties to create new furry friends and unlock rare cattributes.",
+                        "nullable": true
+                    },
+                    "logo": {
+                        "description": "Dapp logo",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "link": {
+                        "description": "Dapp link to DappRadar single dapp page",
+                        "type": "string",
+                        "example": "https://dappradar.com/ethereum/games/cryptokitties"
+                    },
+                    "website": {
+                        "description": "Dapp link to original website",
+                        "type": "string",
+                        "example": "https://www.cryptokitties.co"
+                    },
+                    "categories": {
+                        "description": "Dapp categories",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "title": "Categories",
+                            "example": "games"
+                        }
+                    },
+                    "socialLinks": {
+                        "description": "Dapp social links",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SocialLinksListItem"
+                        }
+                    },
+                    "tags": {
+                        "description": "Dapp tags",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TagsListItem"
+                        }
+                    },
+                    "tokens": {
+                        "description": "List of dapp associated tokens",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TokensListItem"
+                        }
+                    },
+                    "metrics": {
+                        "$ref": "#/components/schemas/DappItemDappMetrics"
+                    },
+                    "chains": {
+                        "description": "Array of dapp supported chains. If Dapp contains more than one chain, it is multichain dapp.",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "title": "Chains",
+                            "example": "ethereum"
+                        }
+                    },
+                    "firstTransactionDate": {
+                        "description": "Date of the dapp's first transaction (yyyy-MM-dd)",
+                        "type": "string",
+                        "example": "2018-01-08"
+                    }
+                }
+            },
+            "DappItem": {
+                "type": "object",
+                "title": "Dapp Item",
+                "properties": {
+                    "success": {
+                        "description": "Status of response",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "range": {
+                        "description": "Request range",
+                        "type": "string",
+                        "example": "24h"
+                    },
+                    "chain": {
+                        "description": "Requested chain",
+                        "type": "string",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "results": {
+                        "$ref": "#/components/schemas/DappItemDapp"
+                    }
+                }
+            },
+            "NotFound": {
+                "type": "object",
+                "additionalProperties": false,
+                "minProperties": 1,
+                "description": "The Problem Details JSON Object.",
+                "properties": {
+                    "success": {
+                        "description": "Status of response",
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Resource not found!"
+                    }
+                }
+            },
+            "TopDappListItem": {
+                "type": "object",
+                "title": "Dapps",
+                "properties": {
+                    "dappId": {
+                        "description": "Dapp unique identifier (ID)",
+                        "type": "integer",
+                        "example": 1852
+                    },
+                    "name": {
+                        "description": "Dapp title/name",
+                        "type": "string",
+                        "example": "CryptoKitties"
+                    },
+                    "description": {
+                        "description": "Dapp short description",
+                        "type": "string",
+                        "example": "In CryptoKitties, users collect and breed",
+                        "nullable": true
+                    },
+                    "fullDescription": {
+                        "description": "Dapp full description",
+                        "type": "string",
+                        "example": "In CryptoKitties, users collect and breed oh-so-adorable creatures that we call CryptoKitties! Each kitty has a unique genome that defines its appearance and traits. Players can breed their kitties to create new furry friends and unlock rare cattributes.",
+                        "nullable": true
+                    },
+                    "logo": {
+                        "description": "Dapp logo",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "link": {
+                        "description": "Dapp link to DappRadar single dapp page",
+                        "type": "string",
+                        "example": "https://dappradar.com/ethereum/games/cryptokitties"
+                    },
+                    "website": {
+                        "description": "Dapp link to original website",
+                        "type": "string",
+                        "example": "https://www.cryptokitties.co"
+                    },
+                    "chains": {
+                        "description": "Array of dapp supported chains. If Dapp contains more than one chain, it is multichain dapp.",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "title": "Chains",
+                            "example": "ethereum"
+                        }
+                    },
+                    "categories": {
+                        "description": "Dapp categories",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "title": "Categories",
+                            "example": "games"
+                        }
+                    },
+                    "socialLinks": {
+                        "description": "Dapp social links",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SocialLinksListItem"
+                        }
+                    },
+                    "metrics": {
+                        "$ref": "#/components/schemas/DappItemDappMetrics"
+                    },
+                    "tags": {
+                        "description": "Array of dapp tags",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TagsListItem"
+                        }
+                    }
+                }
+            },
+            "TopDappList": {
+                "type": "object",
+                "title": "Dapps",
+                "properties": {
+                    "success": {
+                        "description": "Status of response",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "chain": {
+                        "description": "Requested chain",
+                        "type": "string",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "category": {
+                        "description": "Requested category",
+                        "type": "string",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "range": {
+                        "description": "Requested range",
+                        "type": "string",
+                        "example": "24h"
+                    },
+                    "top": {
+                        "description": "Requested Top results amount",
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TopDappListItem"
+                        }
+                    }
+                }
+            },
+            "DappItemHistoryItem": {
+                "type": "object",
+                "title": "Time range",
+                "properties": {
+                    "timestamp": {
+                        "description": "Timestamp of time range",
+                        "type": "integer",
+                        "example": 1659484800
+                    },
+                    "date": {
+                        "description": "Date of time range (UTC)",
+                        "type": "string",
+                        "example": "2022-08-03"
+                    },
+                    "value": {
+                        "description": "Value of time range",
+                        "type": "number",
+                        "example": 11404250
+                    }
+                }
+            },
+            "DappItemHistory": {
+                "type": "object",
+                "title": "Dapp Item History",
+                "properties": {
+                    "success": {
+                        "description": "Status of response",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "minimumDateFrom": {
+                        "description": "Minimum available dateFrom date",
+                        "type": "string",
+                        "example": "2018-01-08"
+                    },
+                    "chains": {
+                        "description": "Array of dapp supported chains. If Dapp contains more than one chain, it is multichain dapp.",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "title": "Chains",
+                            "example": "ethereum"
+                        }
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DappItemHistoryItem"
+                        }
+                    }
+                }
+            },
+            "DappListItemWithMetrics": {
+                "type": "object",
+                "title": "Dapps",
+                "properties": {
+                    "dappId": {
+                        "description": "Dapp unique identifier (ID)",
+                        "type": "integer",
+                        "example": 1852
+                    },
+                    "name": {
+                        "description": "Dapp title/name",
+                        "type": "string",
+                        "example": "CryptoKitties"
+                    },
+                    "description": {
+                        "description": "Dapp short description",
+                        "type": "string",
+                        "example": "In CryptoKitties, users collect and breed",
+                        "nullable": true
+                    },
+                    "fullDescription": {
+                        "description": "Dapp full description",
+                        "type": "string",
+                        "example": "In CryptoKitties, users collect and breed oh-so-adorable creatures that we call CryptoKitties! Each kitty has a unique genome that defines its appearance and traits. Players can breed their kitties to create new furry friends and unlock rare cattributes.",
+                        "nullable": true
+                    },
+                    "logo": {
+                        "description": "Dapp logo",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "link": {
+                        "description": "Dapp link to DappRadar single dapp page",
+                        "type": "string",
+                        "example": "https://dappradar.com/ethereum/games/cryptokitties"
+                    },
+                    "website": {
+                        "description": "Dapp link to original website",
+                        "type": "string",
+                        "example": "https://www.cryptokitties.co"
+                    },
+                    "chains": {
+                        "description": "Array of dapp supported chains. If Dapp contains more than one chain, it is multichain dapp.",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "title": "Chains",
+                            "example": "ethereum"
+                        }
+                    },
+                    "categories": {
+                        "description": "Dapp categories",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "title": "Categories",
+                            "example": "games"
+                        }
+                    },
+                    "socialLinks": {
+                        "description": "Dapp social links",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SocialLinksListItem"
+                        }
+                    },
+                    "metrics": {
+                        "$ref": "#/components/schemas/DappItemDappMetrics"
+                    },
+                    "tags": {
+                        "description": "Array of dapp tags",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TagsListItem"
+                        }
+                    }
+                }
+            },
+            "DappBySearchList": {
+                "type": "object",
+                "title": "Dapps",
+                "properties": {
+                    "success": {
+                        "description": "Status of response",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "chain": {
+                        "description": "Requested chain",
+                        "type": "string",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DappListItemWithMetrics"
+                        }
+                    },
+                    "page": {
+                        "description": "Current page",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "pageCount": {
+                        "description": "Total amount of pages",
+                        "type": "integer",
+                        "example": 486
+                    },
+                    "resultCount": {
+                        "description": "Total amount of results",
+                        "type": "integer",
+                        "example": 12134
+                    },
+                    "resultsPerPage": {
+                        "description": "Results amount per page",
+                        "type": "integer",
+                        "example": 25
+                    }
+                }
+            },
+            "AggregatedDappMetricsItemMetrics": {
+                "type": "object",
+                "title": "Metrics",
+                "properties": {
+                    "transactions": {
+                        "description": "Transactions count in requested range",
+                        "type": "integer",
+                        "example": 65483
+                    },
+                    "transactionsPercentageChange": {
+                        "description": "Transactions percentage change in requested range",
+                        "type": "number",
+                        "example": 65483
+                    },
+                    "uaw": {
+                        "description": "Unique users count in requested range",
+                        "type": "integer",
+                        "example": 27448
+                    },
+                    "uawPercentageChange": {
+                        "description": "Unique users percentage change in requested range",
+                        "type": "integer",
+                        "example": 27448
+                    },
+                    "volume": {
+                        "description": "Total volume (USD) in requested range",
+                        "type": "number",
+                        "example": 11219457.28
+                    },
+                    "volumePercentageChange": {
+                        "description": "Total volume (USD) percentage change in requested range",
+                        "type": "number",
+                        "example": 11219457.28
+                    },
+                    "balance": {
+                        "description": "Total balance",
+                        "type": "number",
+                        "example": 87319477.8
+                    },
+                    "balancePercentageChange": {
+                        "description": "Total balance percentage change",
+                        "type": "number",
+                        "example": 87319477.8
+                    }
+                }
+            },
+            "DappAggregatedMetricsListItem": {
+                "type": "object",
+                "title": "Dapp metrics",
+                "properties": {
+                    "dappId": {
+                        "description": "Dapp unique identifier (ID)",
+                        "type": "integer",
+                        "example": 1852
+                    },
+                    "name": {
+                        "description": "Dapp title/name",
+                        "type": "string",
+                        "example": "CryptoKitties"
+                    },
+                    "metrics": {
+                        "$ref": "#/components/schemas/AggregatedDappMetricsItemMetrics"
+                    }
+                }
+            },
+            "DappAggregatedMetricsList": {
+                "type": "object",
+                "title": "Dapps",
+                "properties": {
+                    "success": {
+                        "description": "Status of response",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "chain": {
+                        "description": "Requested chain",
+                        "type": "string",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "range": {
+                        "description": "Request range",
+                        "type": "string",
+                        "example": "24h"
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DappAggregatedMetricsListItem"
+                        }
+                    },
+                    "page": {
+                        "description": "Current page",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "pageCount": {
+                        "description": "Total amount of pages",
+                        "type": "integer",
+                        "example": 486
+                    },
+                    "resultCount": {
+                        "description": "Total amount of results",
+                        "type": "integer",
+                        "example": 12134
+                    },
+                    "resultsPerPage": {
+                        "description": "Results amount per page",
+                        "type": "integer",
+                        "example": 25
+                    }
+                }
+            },
+            "CollectionListItem": {
+                "type": "object",
+                "title": "Collection",
+                "properties": {
+                    "collectionId": {
+                        "description": "Collection unique identifier (ID)",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "description": "Collection title",
+                        "type": "string",
+                        "example": "CryptoPunks"
+                    },
+                    "chains": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "title": "Chains",
+                            "example": [
+                                "ethereum"
+                            ]
+                        }
+                    },
+                    "logo": {
+                        "description": "Collection logo",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "link": {
+                        "description": "Collection link to DappRadar single dapp page",
+                        "type": "string",
+                        "example": "https://dappradar.com/ethereum/collectibles/cryptopunks",
+                        "nullable": true
+                    },
+                    "dappId": {
+                        "description": "Dapp unique identifier (ID)",
+                        "type": "integer",
+                        "example": 4562,
+                        "nullable": true
+                    },
+                    "avgPrice": {
+                        "description": "Average sales price (USD) in requested range",
+                        "type": "number",
+                        "example": 368587.4994,
+                        "nullable": true
+                    },
+                    "avgPricePercentageChange": {
+                        "description": "The percentage change of Average sales price (USD) in requested range",
+                        "type": "number",
+                        "example": 143.02,
+                        "nullable": true
+                    },
+                    "volume": {
+                        "description": "Sales volume (USD) in requested range",
+                        "type": "number",
+                        "example": 1842937.497,
+                        "nullable": true
+                    },
+                    "volumePercentageChange": {
+                        "description": "The percentage change of Sales Volume (USD) in requested range",
+                        "type": "number",
+                        "example": 203.78,
+                        "nullable": true
+                    },
+                    "sales": {
+                        "description": "Total sales count in requested range",
+                        "type": "number",
+                        "example": 5,
+                        "nullable": true
+                    },
+                    "salesPercentageChange": {
+                        "description": "The percentage change of Total sales in requested range",
+                        "type": "number",
+                        "example": 25,
+                        "nullable": true
+                    },
+                    "marketCap": {
+                        "description": "MarketCap (USD) in requested range",
+                        "type": "number",
+                        "example": 1053160575,
+                        "nullable": true
+                    },
+                    "marketCapPercentageChange": {
+                        "description": "The percentage change of MarketCap (USD) in requested range",
+                        "type": "number",
+                        "example": 4.13,
+                        "nullable": true
+                    },
+                    "floorPrice": {
+                        "description": "Floor price (USD) in requested range",
+                        "type": "number",
+                        "example": 105179.84,
+                        "nullable": true
+                    },
+                    "floorPricePercentageChange": {
+                        "description": "The percentage change of Floor price (USD) in requested range",
+                        "type": "number",
+                        "example": 4.52,
+                        "nullable": true
+                    },
+                    "traders": {
+                        "description": "Unique traders count in requested range",
+                        "type": "number",
+                        "example": 10,
+                        "nullable": true
+                    },
+                    "tradersPercentageChange": {
+                        "description": "The percentage change of Unique traders count in requested range",
+                        "type": "number",
+                        "example": 42.86,
+                        "nullable": true
+                    }
+                }
+            },
+            "CollectionList": {
+                "type": "object",
+                "title": "Collections",
+                "properties": {
+                    "success": {
+                        "description": "Status of response",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "range": {
+                        "description": "Requested range",
+                        "type": "string",
+                        "example": "24h"
+                    },
+                    "sort": {
+                        "description": "Requested sort",
+                        "type": "string",
+                        "example": "traders"
+                    },
+                    "order": {
+                        "description": "Requested order",
+                        "type": "string",
+                        "example": "traders"
+                    },
+                    "chain": {
+                        "description": "Requested chain",
+                        "type": "string",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CollectionListItem"
+                        }
+                    },
+                    "page": {
+                        "description": "Current page",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "pageCount": {
+                        "description": "Total amount of pages",
+                        "type": "integer",
+                        "example": 486
+                    },
+                    "resultCount": {
+                        "description": "Total amount of results",
+                        "type": "integer",
+                        "example": 12134
+                    },
+                    "resultsPerPage": {
+                        "description": "Results amount per page",
+                        "type": "integer",
+                        "example": 25
+                    }
+                }
+            },
+            "CollectionItemCollectionMetrics": {
+                "type": "object",
+                "title": "Metrics",
+                "properties": {
+                    "avgPrice": {
+                        "description": "Average sales price (USD) in requested range",
+                        "type": "number",
+                        "example": 11219457.28,
+                        "nullable": true
+                    },
+                    "avgPricePercentageChange": {
+                        "description": "The percentage change of Average sales price (USD) in requested range",
+                        "type": "number",
+                        "example": 31.658,
+                        "nullable": true
+                    },
+                    "traders": {
+                        "description": "Unique traders count in requested range",
+                        "type": "integer",
+                        "example": 27448,
+                        "nullable": true
+                    },
+                    "tradersPercentageChange": {
+                        "description": "The percentage change of Unique traders count in requested range",
+                        "type": "number",
+                        "example": 42.86,
+                        "nullable": true
+                    },
+                    "volume": {
+                        "description": "Sales volume (USD) in requested range",
+                        "type": "number",
+                        "example": 65483,
+                        "nullable": true
+                    },
+                    "volumePercentageChange": {
+                        "description": "The percentage change of Sales Volume (USD) in requested range",
+                        "type": "number",
+                        "example": 203.78,
+                        "nullable": true
+                    },
+                    "sales": {
+                        "description": "Total sales count in requested range",
+                        "type": "integer",
+                        "example": 11219457.28,
+                        "nullable": true
+                    },
+                    "salesPercentageChange": {
+                        "description": "The percentage change of Total sales in requested range",
+                        "type": "number",
+                        "example": 25,
+                        "nullable": true
+                    },
+                    "marketCap": {
+                        "description": "MarketCap (USD) in requested range",
+                        "type": "number",
+                        "example": 11219457.28,
+                        "nullable": true
+                    },
+                    "marketCapPercentageChange": {
+                        "description": "The percentage change of MarketCap (USD) in requested range",
+                        "type": "number",
+                        "example": 4.13,
+                        "nullable": true
+                    },
+                    "floorPrice": {
+                        "description": "Floor price (USD) in requested range",
+                        "type": "number",
+                        "example": 11219457.28,
+                        "nullable": true
+                    },
+                    "floorPricePercentageChange": {
+                        "description": "The percentage change of Floor price (USD) in requested range",
+                        "type": "number",
+                        "example": 4.52,
+                        "nullable": true
+                    }
+                }
+            },
+            "CollectionItemCollection": {
+                "type": "object",
+                "title": "Collection",
+                "properties": {
+                    "collectionId": {
+                        "description": "Collection unique identifier (ID)",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "description": "Collection title/name",
+                        "type": "string",
+                        "example": "CryptoKitties"
+                    },
+                    "chains": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "title": "Chains",
+                            "example": [
+                                "ethereum",
+                                "polygon"
+                            ]
+                        }
+                    },
+                    "logo": {
+                        "description": "Collection logo",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "dappId": {
+                        "description": "Dapp unique identifier (ID)",
+                        "type": "integer",
+                        "example": 13,
+                        "nullable": true
+                    },
+                    "metrics": {
+                        "$ref": "#/components/schemas/CollectionItemCollectionMetrics"
+                    }
+                }
+            },
+            "CollectionItem": {
+                "type": "object",
+                "title": "Collection Item",
+                "properties": {
+                    "success": {
+                        "description": "Status of response",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "range": {
+                        "description": "Request range",
+                        "type": "string",
+                        "example": "24h"
+                    },
+                    "chain": {
+                        "description": "Requested chain",
+                        "type": "string",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "results": {
+                        "$ref": "#/components/schemas/CollectionItemCollection"
+                    }
+                }
+            },
+            "MarketplacesListItem": {
+                "type": "object",
+                "title": "Marketplaces",
+                "properties": {
+                    "name": {
+                        "description": "Collection title",
+                        "type": "string",
+                        "example": "CryptoPunks"
+                    },
+                    "chains": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "title": "Chains",
+                            "example": [
+                                "ethereum",
+                                "polygon"
+                            ]
+                        }
+                    },
+                    "logo": {
+                        "description": "Collection logo",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "dappId": {
+                        "description": "Dapp unique identifier (ID)",
+                        "type": "integer",
+                        "example": 13,
+                        "nullable": true
+                    },
+                    "avgPrice": {
+                        "description": "Average price in requested range (USD)",
+                        "type": "number",
+                        "example": 110.3794,
+                        "nullable": true
+                    },
+                    "avgPricePercentageChange": {
+                        "description": "The percentage change of Average sales price (USD) in requested range",
+                        "type": "number",
+                        "example": 31.658,
+                        "nullable": true
+                    },
+                    "volume": {
+                        "description": "Volume in requested range (USD)",
+                        "type": "number",
+                        "example": 13982449.41805,
+                        "nullable": true
+                    },
+                    "volumePercentageChange": {
+                        "description": "The percentage change of Sales Volume (USD) in requested range",
+                        "type": "number",
+                        "example": -7.802,
+                        "nullable": true
+                    },
+                    "traders": {
+                        "description": "Traders in requested range",
+                        "type": "number",
+                        "example": 28622,
+                        "nullable": true
+                    },
+                    "tradersPercentageChange": {
+                        "description": "The percentage change of Unique traders count in requested range",
+                        "type": "number",
+                        "example": -29.006,
+                        "nullable": true
+                    }
+                }
+            },
+            "MarketplacesList": {
+                "type": "object",
+                "title": "Marketplaces",
+                "properties": {
+                    "success": {
+                        "description": "Status of response",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "range": {
+                        "description": "Requested range",
+                        "type": "string",
+                        "example": "24h"
+                    },
+                    "sort": {
+                        "description": "Requested sort",
+                        "type": "string",
+                        "example": "traders"
+                    },
+                    "order": {
+                        "description": "Requested order",
+                        "type": "string",
+                        "example": "traders"
+                    },
+                    "chain": {
+                        "description": "Requested chain",
+                        "type": "string",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/MarketplacesListItem"
+                        }
+                    },
+                    "page": {
+                        "description": "Current page",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "pageCount": {
+                        "description": "Total amount of pages",
+                        "type": "integer",
+                        "example": 486
+                    },
+                    "resultCount": {
+                        "description": "Total amount of results",
+                        "type": "integer",
+                        "example": 12134
+                    },
+                    "resultsPerPage": {
+                        "description": "Results amount per page",
+                        "type": "integer",
+                        "example": 25
+                    }
+                }
+            },
+            "EstimatedCollectionListItem": {
+                "type": "object",
+                "title": "Estimated collections",
+                "properties": {
+                    "collectionId": {
+                        "description": "Collection unique identifier (ID)",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "description": "Collection title",
+                        "type": "string",
+                        "example": "CryptoPunks"
+                    },
+                    "chains": {
+                        "description": "Array of dapp supported chains. If collection contains more than one chain, it is multichain collection.",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "title": "Chains",
+                            "example": "ethereum"
+                        }
+                    }
+                }
+            },
+            "EstimatedCollectionList": {
+                "type": "object",
+                "title": "Estimated collections",
+                "properties": {
+                    "success": {
+                        "description": "Status of response",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/EstimatedCollectionListItem"
+                        }
+                    },
+                    "page": {
+                        "description": "Current page",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "pageCount": {
+                        "description": "Total amount of pages",
+                        "type": "integer",
+                        "example": 8
+                    },
+                    "resultCount": {
+                        "description": "Total amount of results",
+                        "type": "integer",
+                        "example": 71
+                    },
+                    "resultsPerPage": {
+                        "description": "Results amount per page",
+                        "type": "integer",
+                        "example": 10
+                    }
+                }
+            },
+            "EstimatedNftCollection": {
+                "type": "object",
+                "title": "Collection Estimation",
+                "properties": {
+                    "collectionId": {
+                        "description": "Collection unique identifier (ID)",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "smartContracts": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "title": "Smart contracts",
+                            "example": "0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb"
+                        }
+                    },
+                    "estimatedPrice": {
+                        "description": "Estimated NFT price (USD)",
+                        "type": "number",
+                        "example": 111951.28
+                    },
+                    "estimatedPriceInCrypto": {
+                        "description": "Estimated NFT price in crypto",
+                        "type": "number",
+                        "example": 68.28
+                    },
+                    "symbol": {
+                        "description": "Crypto symbol",
+                        "type": "string",
+                        "example": "ETH"
+                    }
+                }
+            },
+            "EstimatedNftCollectionResults": {
+                "type": "object",
+                "title": "Estimated NFT Collection",
+                "properties": {
+                    "success": {
+                        "description": "Status of response",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "results": {
+                        "$ref": "#/components/schemas/EstimatedNftCollection"
+                    }
+                }
+            },
+            "EstimatedNftItem": {
+                "type": "object",
+                "title": "NFT Estimation",
+                "properties": {
+                    "collectionId": {
+                        "description": "Collection unique identifier (ID)",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "nftId": {
+                        "description": "NFT unique identifier (ID)",
+                        "type": "string",
+                        "example": "1"
+                    },
+                    "smartContracts": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "title": "Smart contracts",
+                            "example": "0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb"
+                        }
+                    },
+                    "estimatedPrice": {
+                        "description": "Estimated NFT price (USD)",
+                        "type": "number",
+                        "example": 111951.28
+                    },
+                    "estimatedPriceInCrypto": {
+                        "description": "Estimated NFT price in crypto",
+                        "type": "number",
+                        "example": 68.28
+                    },
+                    "symbol": {
+                        "description": "Crypto symbol",
+                        "type": "string",
+                        "example": "ETH"
+                    }
+                }
+            },
+            "EstimatedNftResults": {
+                "type": "object",
+                "title": "Estimated NFT Item",
+                "properties": {
+                    "success": {
+                        "description": "Status of response",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "results": {
+                        "$ref": "#/components/schemas/EstimatedNftItem"
+                    }
+                }
+            },
+            "MetadataCollection": {
+                "type": "object",
+                "title": "The Metadata of NFT Collection",
+                "properties": {
+                    "name": {
+                        "description": "Collection unique identifier (ID)",
+                        "type": "string",
+                        "example": "CryptoPunks",
+                        "nullable": true
+                    },
+                    "description": {
+                        "description": "NFT unique identifier (ID)",
+                        "type": "string",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "logo": {
+                        "description": "Estimated NFT price (USD)",
+                        "type": "string",
+                        "example": "https://user-dashboard.s3.us-east-2.amazonaws.com/nft-metadata/cryptopunks/cryptopunks_64_64.png",
+                        "nullable": true
+                    }
+                }
+            },
+            "MetadataOwners": {
+                "type": "object",
+                "title": "The owners of NFT",
+                "description": "The amount of owners is limited to 1000 rows",
+                "properties": {
+                    "wallet": {
+                        "description": "Owner wallet address",
+                        "type": "string",
+                        "example": "0xb88f61e6fbda83fbfffabe364112137480398018"
+                    },
+                    "amount": {
+                        "description": "Number of NFTs per wallet",
+                        "type": "number",
+                        "example": 1
+                    }
+                }
+            },
+            "MetadataMetadataListItem": {
+                "type": "object",
+                "title": "The Metadata of NFT Collection",
+                "properties": {
+                    "name": {
+                        "description": "The label of metadata value",
+                        "type": "string",
+                        "example": "type",
+                        "nullable": true
+                    },
+                    "value": {
+                        "description": "The value of metadata",
+                        "example": "Male",
+                        "nullable": true
+                    }
+                }
+            },
+            "MetadataPrice": {
+                "type": "object",
+                "title": "NFT price",
+                "nullable": true,
+                "properties": {
+                    "fiat": {
+                        "description": "The price in USD",
+                        "type": "number",
+                        "example": 36337.8
+                    },
+                    "crypto": {
+                        "description": "The price in Crypto",
+                        "type": "number",
+                        "example": 113139.7775
+                    },
+                    "symbol": {
+                        "description": "Crypto symbol",
+                        "type": "string",
+                        "example": "ETH"
+                    }
+                }
+            },
+            "MetadataNftItem": {
+                "type": "object",
+                "title": "NFT Metadata",
+                "properties": {
+                    "nftId": {
+                        "description": "NFT unique identifier (ID)",
+                        "type": "string",
+                        "example": "1"
+                    },
+                    "name": {
+                        "description": "NFT title/name",
+                        "type": "string",
+                        "example": "CryptoPunk #1",
+                        "nullable": true
+                    },
+                    "description": {
+                        "description": "NFT description",
+                        "type": "string",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "media": {
+                        "description": "NFT media URL",
+                        "type": "string",
+                        "example": "https://user-dashboard.s3.us-east-2.amazonaws.com/nft-metadata/0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb/1.png",
+                        "nullable": true
+                    },
+                    "totalMinted": {
+                        "description": "The number of total minted NFTs",
+                        "type": "number",
+                        "example": 1
+                    },
+                    "collection": {
+                        "$ref": "#/components/schemas/MetadataCollection"
+                    },
+                    "owners": {
+                        "$ref": "#/components/schemas/MetadataOwners"
+                    },
+                    "metadata": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/MetadataMetadataListItem"
+                        }
+                    },
+                    "lastSalePrice": {
+                        "$ref": "#/components/schemas/MetadataPrice"
+                    },
+                    "floorPrice": {
+                        "$ref": "#/components/schemas/MetadataPrice"
+                    },
+                    "estimatedPrice": {
+                        "$ref": "#/components/schemas/MetadataPrice"
+                    },
+                    "metadataSource": {
+                        "description": "The original source of NFT metadata",
+                        "type": "string",
+                        "example": "https://www.larvalabs.com/cryptopunks/details/1",
+                        "nullable": true
+                    }
+                }
+            },
+            "MetadataNftItemResults": {
+                "type": "object",
+                "title": "Metadata of NFT Item",
+                "properties": {
+                    "success": {
+                        "description": "Status of response",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "results": {
+                        "$ref": "#/components/schemas/MetadataNftItem"
+                    }
+                }
+            },
+            "TokenPriceItem": {
+                "type": "object",
+                "title": "Token price",
+                "properties": {
+                    "price": {
+                        "description": "Curren token price (USD)",
+                        "type": "number",
+                        "example": 0.01238778
+                    },
+                    "updatedAt": {
+                        "description": "Timestamp of last price update",
+                        "type": "number",
+                        "example": 1679500925044
+                    }
+                }
+            },
+            "TokenPriceResults": {
+                "type": "object",
+                "title": "Token price",
+                "properties": {
+                    "success": {
+                        "description": "Status of response",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "results": {
+                        "$ref": "#/components/schemas/TokenPriceItem"
+                    }
+                }
+            },
+            "HistoricalTokenPriceItem": {
+                "type": "object",
+                "title": "Historical Token price",
+                "properties": {
+                    "timestamp": {
+                        "description": "Timestamp of aggregated day range",
+                        "type": "number",
+                        "example": 1679356800
+                    },
+                    "price": {
+                        "description": "Historical token price (USD) in timestamp",
+                        "type": "number",
+                        "example": 0.01098106
+                    }
+                }
+            },
+            "HistoricalTokenPriceResults": {
+                "type": "object",
+                "title": "Historical Token prices",
+                "properties": {
+                    "success": {
+                        "description": "Status of response",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "dateFrom": {
+                        "description": "Requested dateFrom value",
+                        "type": "string",
+                        "example": "2023-01-08"
+                    },
+                    "dateTo": {
+                        "description": "Requested dateTo value",
+                        "type": "string",
+                        "example": "2023-02-08"
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/HistoricalTokenPriceItem"
+                        }
+                    }
+                }
+            },
+            "TokenInfoItem": {
+                "type": "object",
+                "title": "Token price",
+                "properties": {
+                    "name": {
+                        "description": "Token name/title",
+                        "type": "string",
+                        "example": "DappRadar"
+                    },
+                    "symbol": {
+                        "description": "Token symbol",
+                        "type": "string",
+                        "example": "radar"
+                    },
+                    "logo": {
+                        "description": "Token logo",
+                        "type": "string",
+                        "example": "https://token-repository.dappradar.com/tokens?protocol=ethereum&contract=0x44709a920fccf795fbc57baa433cc3dd53c44dbe&file=logo.png",
+                        "nullable": true
+                    },
+                    "decimals": {
+                        "description": "Token decimals",
+                        "type": "number",
+                        "example": 18
+                    }
+                }
+            },
+            "TokenInfoResults": {
+                "type": "object",
+                "title": "Token static information",
+                "properties": {
+                    "success": {
+                        "description": "Status of response",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "results": {
+                        "$ref": "#/components/schemas/TokenInfoItem"
+                    }
+                }
+            },
+            "TokenMetricsItem": {
+                "type": "object",
+                "title": "Token metrics",
+                "properties": {
+                    "volume": {
+                        "description": "Token volume (USD) in range",
+                        "type": "number",
+                        "example": 358176
+                    },
+                    "marketCap": {
+                        "description": "Token marketCap (USD) in range",
+                        "type": "number",
+                        "example": 108933600
+                    },
+                    "priceChange": {
+                        "description": "Token price change percentage in range",
+                        "type": "number",
+                        "example": 6.36
+                    }
+                }
+            },
+            "TokenMetricsResults": {
+                "type": "object",
+                "title": "Token metrics",
+                "properties": {
+                    "success": {
+                        "description": "Status of response",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "range": {
+                        "description": "Request range",
+                        "type": "string",
+                        "example": "24h"
+                    },
+                    "results": {
+                        "$ref": "#/components/schemas/TokenMetricsItem"
+                    }
+                }
+            },
+            "DeFiDappsListItem": {
+                "type": "object",
+                "title": "DeFi dapp",
+                "properties": {
+                    "dappId": {
+                        "description": "Dapp unique identifier (ID)",
+                        "type": "integer",
+                        "example": 7824
+                    },
+                    "logo": {
+                        "description": "Dapp logo url",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "name": {
+                        "description": "Dapp title/name",
+                        "type": "string",
+                        "example": "LIDO"
+                    },
+                    "chains": {
+                        "description": "Array of dapp supported chains. If collection contains more than one chain, it is multichain collection.",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "title": "Chains",
+                            "example": "ethereum"
+                        }
+                    },
+                    "tokenName": {
+                        "description": "DeFi dapp main token name",
+                        "type": "string",
+                        "example": "Lido DAO Token",
+                        "nullable": true
+                    },
+                    "tokenLogo": {
+                        "description": "DeFi dapp token logo url",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "tokenPrice": {
+                        "description": "DeFi dapp token price",
+                        "type": "number",
+                        "example": 2.37,
+                        "nullable": true
+                    },
+                    "tokenPricePercentageChange": {
+                        "description": "DeFi dapp token price percentage change in selected range",
+                        "type": "number",
+                        "example": 6.25,
+                        "nullable": true
+                    },
+                    "tokenSymbol": {
+                        "description": "DeFi dapp token symbol",
+                        "type": "string",
+                        "example": "LDO",
+                        "nullable": true
+                    },
+                    "marketCap": {
+                        "description": "DeFi dapp market cap (USD)",
+                        "type": "number",
+                        "example": 2370000000,
+                        "nullable": true
+                    },
+                    "marketCapPercentageChange": {
+                        "description": "The percentage change of marketCap (USD) in selected range",
+                        "type": "number",
+                        "example": 5.8,
+                        "nullable": true
+                    },
+                    "adjustedTvl": {
+                        "description": "DeFi dapp inflation adjusted total value locked, prices locked as of 90 days prior (USD)",
+                        "type": "number",
+                        "example": 8635007723.1766,
+                        "nullable": true
+                    },
+                    "adjustedTvlPercentageChange": {
+                        "description": "The percentage change of adjustedTvl (USD) in selected range",
+                        "type": "number",
+                        "example": 2.54,
+                        "nullable": true
+                    },
+                    "tvl": {
+                        "description": "DeFi dapp total value locked (nominal)",
+                        "type": "number",
+                        "example": 11823442811.5309,
+                        "nullable": true
+                    },
+                    "tvlPercentageChange": {
+                        "description": "The percentage change of TVL (USD) in selected range",
+                        "type": "number",
+                        "example": 3.61,
+                        "nullable": true
+                    },
+                    "marketCapTvl": {
+                        "description": "Ratio of fully diluted market capitalization to nominal TVL",
+                        "type": "number",
+                        "example": 0.2,
+                        "nullable": true
+                    }
+                }
+            },
+            "DeFiDappsList": {
+                "type": "object",
+                "title": "DeFi dapps",
+                "properties": {
+                    "success": {
+                        "description": "Status of response",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "chain": {
+                        "description": "Requested chain",
+                        "type": "string",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "range": {
+                        "description": "Request range",
+                        "type": "string",
+                        "example": "24h"
+                    },
+                    "sort": {
+                        "description": "Requested sort",
+                        "type": "string",
+                        "example": "tvl"
+                    },
+                    "order": {
+                        "description": "Requested order",
+                        "type": "string",
+                        "example": "traders"
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DeFiDappsListItem"
+                        }
+                    },
+                    "page": {
+                        "description": "Current page",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "pageCount": {
+                        "description": "Total amount of pages",
+                        "type": "integer",
+                        "example": 8
+                    },
+                    "resultCount": {
+                        "description": "Total amount of results",
+                        "type": "integer",
+                        "example": 71
+                    },
+                    "resultsPerPage": {
+                        "description": "Results amount per page",
+                        "type": "integer",
+                        "example": 10
+                    }
+                }
+            },
+            "DeFiDappItemResults": {
+                "type": "object",
+                "title": "DeFi dapp item",
+                "properties": {
+                    "success": {
+                        "description": "Status of response",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "chain": {
+                        "description": "Requested chain",
+                        "type": "string",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "range": {
+                        "description": "Request range",
+                        "type": "string",
+                        "example": "24h"
+                    },
+                    "results": {
+                        "$ref": "#/components/schemas/DeFiDappsListItem"
+                    }
+                }
+            }
+        },
+        "responses": {
+            "Forbidden": {
+                "description": "Forbidden",
+                "content": {
+                    "application/problem+json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/Forbidden"
+                        }
+                    }
+                }
+            },
+            "BadRequest": {
+                "description": "Bad Request",
+                "content": {
+                    "application/problem+json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/BadRequest"
+                        }
+                    }
+                }
+            },
+            "Problem": {
+                "description": "Internal Server Error",
+                "content": {
+                    "application/problem+json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/Problem"
+                        }
+                    }
+                }
+            },
+            "NotFound": {
+                "description": "Not Found",
+                "content": {
+                    "application/problem+json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/NotFound"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

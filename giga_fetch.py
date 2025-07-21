@@ -1,448 +1,310 @@
-import requests
+# import requests
+
+# url = "https://api.coingecko.com/api/v3/search/trending?show_max=nfts"
+
+# headers = {
+#     "accept": "application/json",
+#     "x-cg-api-key": "CG-4ZqWuHvqkpcRYLexcA5Ap1Ef",
+# }
+
+# response = requests.get(url, headers=headers)
+
+# print(response.text)
+# import requests
+
+# url = "https://api.coingecko.com/api/v3/coins/list?include_platform=true&status=active"
+
+# headers = {
+#     "accept": "application/json",
+#     "x-cg-pro-api-key": "CG-4ZqWuHvqkpcRYLexcA5Ap1Ef",
+# }
+
+# response = requests.get(url, headers=headers)
+
+# print(response.text)
+
+
+
+
+ #  3 
+ 
+# import requests
+
+# url = "https://api.coingecko.com/api/v3/coins/pudgy-penguins/history?date=30-12-2017&localization=true"
+
+# headers = {
+#     "accept": "application/json",
+#     "x-cg-api-key": "CG-4ZqWuHvqkpcRYLexcA5Ap1Ef",
+# }
+
+# response = requests.get(url, headers=headers)
+
+# print(response.text)
+
+
+
+
+#4 
 import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import OneHotEncoder
-import os
-import sys
 import json
-from datetime import datetime
-import time
-from dotenv import load_dotenv
-import tweepy
-from nltk.sentiment.vader import SentimentIntensityAnalyzer
-import nltk
 
-twitter_bearer_token = os.getenv("TWITTER_BEARER_TOKEN")
+# --- 1. Load the provided CSV files ---
+try:
+    df_cleaned = pd.read_csv("nft_data_raw_combined.csv")
+    df_for_ml = pd.read_csv("nft_data_cleaned_for_ml.csv")
+    df_mid_drop = pd.read_csv("mid_drop_nft_data.csv")
 
-# 1. API Setup
-open_sea_key = os.getenv("OPENSEA_API_KEY", "24e211c34b284ce4bea594c062ba11bf")
-ALCHEMY_API_KEY = os.getenv("ALCHEMY_API_KEY", "6q_qZNutwscvksSLiK7dYq6NbQ7ddFSd")
-
-BASE_URL_OPENSEA = "https://api.opensea.io/api/v2"
-HEADERS_OPENSEA = {"X-API-KEY": open_sea_key, "accept": "application/json"}
-ALCHEMY_BASE_URL = f"https://eth-mainnet.g.alchemy.com/nft/v3/{ALCHEMY_API_KEY}"
-
-
-# 2. Fetch slugs (unchanged but not used here since we’re using preloaded)
-def fetch_collections():
-    url = "https://api.opensea.io/api/v2/collections?order_by=market_cap"
-    headers = {"accept": "application/json", "x-api-key": open_sea_key}
-    response = requests.get(url, headers=headers)
-    if response.status_code != 200:
-        print(f"Failed to fetch collections: {response.status_code} - {response.text}")
-        return {"collections": []}
-    return response.json()
-
-
-# 3. Fetch NFTs from Collections (OpenSea) - unused here but kept
-def fetch_collection_nfts(slug, max_retries=3):
-    url = f"{BASE_URL_OPENSEA}/collection/{slug}/nfts"
-    params = {"limit": 25}
-    for attempt in range(max_retries):
-        try:
-            response = requests.get(
-                url, headers=HEADERS_OPENSEA, params=params, timeout=10
-            )
-            print(
-                f"Response for {slug}: {response.status_code} - {response.text[:200]}... "
-            )
-            if response.status_code == 200:
-                data = response.json()
-                nfts = data.get("nfts", [])
-                if not isinstance(nfts, list):
-                    print(f"Unexpected data format for {slug}: {data}")
-                    return []
-                return nfts
-            else:
-                print(
-                    f"Attempt {attempt + 1} failed for {slug}: {response.status_code} - {response.text}"
-                )
-                if response.status_code == 429:
-                    time.sleep(2**attempt)
-                else:
-                    break
-        except requests.RequestException as e:
-            print(
-                f"Network error for {slug}: {e}. Attempt {attempt + 1} of {max_retries}"
-            )
-            time.sleep(2**attempt)
-    return []
-
-
-def fetch_alchemy_nfts(owner, max_retries=3):
-    url = f"{ALCHEMY_BASE_URL}/getNFTsForOwner?owner={owner}"
-    for attempt in range(max_retries):
-        try:
-            response = requests.get(url, timeout=10)
-            if response.status_code == 200:
-                return response.json().get("ownedNfts", [])
-            else:
-                print(
-                    f"Attempt {attempt + 1} failed for Alchemy: {response.status_code} - {response.text}"
-                )
-                time.sleep(2**attempt)
-                break
-        except requests.RequestException as e:
-            print(
-                f"Network error for Alchemy: {e}. Attempt {attempt + 1} of {max_retries}"
-            )
-            time.sleep(2**attempt)
-    return []
-
-
-# 6. Fetch Collection Metadata for Spam Filtering
-def fetch_collection_metadata(slug, max_retries=3):
-    url = f"{BASE_URL_OPENSEA}/collections/{slug}"
-    for attempt in range(max_retries):
-        try:
-            response = requests.get(url, headers=HEADERS_OPENSEA, timeout=10)
-            if response.status_code == 200:
-                return response.json()
-            else:
-                print(
-                    f"Attempt {attempt + 1} failed for {slug} metadata: {response.status_code} - {response.text}"
-                )
-                if response.status_code == 429:
-                    time.sleep(2**attempt)
-                else:
-                    break
-        except requests.RequestException as e:
-            print(
-                f"Network error for {slug} metadata: {e}. Attempt {attempt + 1} of {max_retries}"
-            )
-            time.sleep(2**attempt)
-    return {}
-
-
-# 8. Enhanced Spam Detection
-def is_spam(nft_data, collection_meta):
-    print("nft fdataa ", nft_data, "collelction", collection_meta)
-    metadata = nft_data.get("description", "").lower()
-    image = nft_data.get("image_url", "")
-    floor_price = nft_data.get("floor_price", 0)
-    safelist_status = collection_meta.get("safelist_status", "not_requested")
-    volume = collection_meta.get("stats", {}).get("total_volume", 0)
-    is_spam_alchemy = (
-        nft_data.get("contract", {}).get("isSpam", False)
-        if isinstance(nft_data, dict) and "contract" in nft_data
-        else False
+    print("Successfully loaded all CSV files.")
+except FileNotFoundError as e:
+    print(
+        f"Error: One of the CSV files was not found. Please ensure all required CSVs are in the working directory. {e}"
     )
-    return (
-        is_spam_alchemy
-        or not metadata
-        or "http" not in image
-        or "spam" in metadata
-        or floor_price == 0
-        or safelist_status == "not_requested"
-        or volume < 10
-    )
+    exit()
+except Exception as e:
+    print(f"An unexpected error occurred while loading CSV files: {e}")
+    exit()
 
+# --- 2. Standardize column names ---
+# Rename columns for consistency across all DataFrames.
+# We'll prioritize 'floor_price' from df_for_ml/df_mid_drop if it exists, as it might be the 'opensea_floor_price'.
 
-# --- New Function: Fetch Twitter Data and Analyze Sentiment ---
-def fetch_twitter_sentiment(search_query, twitter_bearer_token, limit=100):
-    if not twitter_bearer_token:
-        print("Twitter Bearer Token not found. Skipping Twitter sentiment analysis.")
-        return {
-            "sentiment_score": 0.0,
-            "tweet_volume": 0,
-            "positive_tweets": 0,
-            "negative_tweets": 0,
-            "neutral_tweets": 0,
-        }
-
-    client = tweepy.Client(twitter_bearer_token)
-
-    positive_count = 0
-    negative_count = 0
-    neutral_count = 0
-    total_tweets = 0
-    compound_scores = []
-
-    try:
-        # Search recent tweets
-        response = client.search_recent_tweets(
-            query=search_query,
-            tweet_fields=["created_at", "lang"],  # You can add more fields if needed
-            max_results=min(limit, 100),  # Max results per request is 100
-        )
-
-        if response.data:
-            total_tweets = len(response.data)
-            for tweet in response.data:
-                vs = analyzer.polarity_scores(tweet.text)
-                compound_scores.append(vs["compound"])
-                if vs["compound"] >= 0.05:
-                    positive_count += 1
-                elif vs["compound"] <= -0.05:
-                    negative_count += 1
-                else:
-                    neutral_count += 1
-
-        avg_sentiment = (
-            sum(compound_scores) / len(compound_scores) if compound_scores else 0.0
-        )
-
-        return {
-            "sentiment_score": avg_sentiment,
-            "tweet_volume": total_tweets,
-            "positive_tweets": positive_count,
-            "negative_tweets": negative_count,
-            "neutral_tweets": neutral_count,
-        }
-    except tweepy.TweepyException as e:
-        print(f"Error fetching Twitter data for '{search_query}': {e}")
-        return {
-            "sentiment_score": 0.0,
-            "tweet_volume": 0,
-            "positive_tweets": 0,
-            "negative_tweets": 0,
-            "neutral_tweets": 0,
-        }
-        
-        
-        
-        
-        
-        
-if __name__ == "__main__":
-    load_dotenv()
-    nltk.download("vader_lexicon")
-    analyzer = SentimentIntensityAnalyzer()
-    # Read preloaded collections and NFTs
-    preloaded_file = "preloaded_nfts.txt"
-    preloaded_nfts = {}
-    if os.path.exists(preloaded_file):
-        with open(preloaded_file, "r") as f:
-            for line in f:
-                if line.strip():
-                    try:
-                        slug, nft_data = line.strip().split(":", 1)
-                        nft_list = json.loads(nft_data)
-                        if not isinstance(nft_list, list) or not all(
-                            isinstance(nft, dict) for nft in nft_list
-                        ):
-                            print(f"Invalid preloaded data for {slug}: {nft_data}")
-                            continue
-                        preloaded_nfts[slug] = nft_list
-                    except (json.JSONDecodeError, ValueError) as e:
-                        print(f"Error parsing preloaded data for {slug}: {e}")
-                        continue
-
-    # Use only the first NFT from each preloaded collection
-    all_nfts_opensea = []
-    for slug, nfts in preloaded_nfts.items():
-        if nfts:
-            all_nfts_opensea.append(nfts[0])  # Take only the first NFT
-
-    if not all_nfts_opensea:
-        print("No NFTs fetched from preloaded data. Check preloaded_nfts.txt.")
-        sys.exit(1)
-    else:
-        print(f"Fetched {len(all_nfts_opensea)} NFTs from preloaded data.")
-        print("Sample NFT:", all_nfts_opensea[0])
-
-    # 7. Process and Combine Data
-    valid_nfts = [nft for nft in all_nfts_opensea if isinstance(nft, dict)]
-    print("valid nfts:", valid_nfts)
-    if len(all_nfts_opensea) != len(valid_nfts):
-        print(
-            f"Warning: Filtered {len(all_nfts_opensea) - len(valid_nfts)} invalid NFTs (strings or non-dicts)"
-        )
-        for invalid in [nft for nft in all_nfts_opensea if not isinstance(nft, dict)]:
-            print(f"Invalid NFT: {invalid}")
-    if not valid_nfts:
-        print("No valid NFTs to process. Exiting.")
-        sys.exit(1)
-
-    # Enhance with Alchemy data and new social media data
-    for i, nft in enumerate(valid_nfts):
-        contract_address = nft.get("contract", "")
-        token_id = nft.get("identifier", "")
-        collection_slug = nft.get(
-            "collection", ""
-        )  # Get the collection slug for Twitter search
-
-        if contract_address and token_id:
-            # --- Existing Alchemy Calls (corrected for contract_address) ---
-            # Fetch floor price
-            print(
-                f"For NFT {token_id} in {collection_slug}, contract is: {contract_address}"
-            )
-            url = f"{ALCHEMY_BASE_URL}/getFloorPrice?contractAddress={contract_address}"
-            try:
-                response = requests.get(url, timeout=10)
-                if response.status_code == 200:
-                    floor_data = response.json()
-                    if (
-                        "openSea" in floor_data
-                        and "floorPrice" in floor_data["openSea"]
-                    ):
-                        valid_nfts[i]["floor_price"] = floor_data["openSea"][
-                            "floorPrice"
-                        ]
-                        valid_nfts[i]["price_currency"] = floor_data["openSea"][
-                            "priceCurrency"
-                        ]
-                    else:
-                        print(
-                            f"No OpenSea floor price data found for {contract_address}"
-                        )
-                else:
-                    print(
-                        f"Failed floor price for {contract_address}: {response.status_code} - {response.text}"
-                    )
-            except requests.RequestException as e:
-                print(f"Network error for floor price {contract_address}: {e}")
-
-            # Fetch NFT metadata (from Alchemy)
-            url = f"{ALCHEMY_BASE_URL}/getNFTMetadata?contractAddress={contract_address}&tokenId={token_id}"
-            try:
-                response = requests.get(url, timeout=10)
-                if response.status_code == 200:
-                    meta_data = response.json()
-                    if (
-                        "contract" in meta_data
-                        and "openSeaMetadata" in meta_data["contract"]
-                    ):
-                        valid_nfts[i].update(
-                            {
-                                "collection_name": meta_data["contract"][
-                                    "openSeaMetadata"
-                                ].get("collectionName", ""),
-                                "description": meta_data["contract"][
-                                    "openSeaMetadata"
-                                ].get("description", ""),
-                                "total_supply": meta_data["contract"].get(
-                                    "totalSupply", 0
-                                ),
-                            }
-                        )
-                else:
-                    print(
-                        f"Failed metadata for {contract_address}/{token_id}: {response.status_code} - {response.text}"
-                    )
-            except requests.RequestException as e:
-                print(f"Network error for metadata {contract_address}/{token_id}: {e}")
-
-        # --- New: Fetch Twitter Data for the Collection ---
-        if collection_slug:
-            # Use collection_name if available, otherwise collection_slug for search query
-            search_term = valid_nfts[i].get("collection_name", collection_slug)
-            twitter_data = fetch_twitter_sentiment(search_term, twitter_bearer_token)
-            valid_nfts[i]["twitter_sentiment"] = twitter_data["sentiment_score"]
-            valid_nfts[i]["twitter_tweet_volume"] = twitter_data["tweet_volume"]
-            valid_nfts[i]["twitter_positive_tweets"] = twitter_data["positive_tweets"]
-            valid_nfts[i]["twitter_negative_tweets"] = twitter_data["negative_tweets"]
-            valid_nfts[i]["twitter_neutral_tweets"] = twitter_data["neutral_tweets"]
-        else:
-            valid_nfts[i]["twitter_sentiment"] = 0.0
-            valid_nfts[i]["twitter_tweet_volume"] = 0
-            valid_nfts[i]["twitter_positive_tweets"] = 0
-            valid_nfts[i]["twitter_negative_tweets"] = 0
-            valid_nfts[i]["twitter_neutral_tweets"] = 0
-
-    # --- DataFrame creation (updated to include new columns) ---
-    data = {
-        "owner_address": [nft.get("owner", "") for nft in valid_nfts],
-        "contract_address": [nft.get("contract", "") for nft in valid_nfts],
-        "token_id": [nft.get("identifier", "") for nft in valid_nfts],
-        "token_type": [nft.get("token_standard", "ERC721") for nft in valid_nfts],
-        "balance": [nft.get("balance", 1) for nft in valid_nfts],
-        "collection_name": [nft.get("collection_name", "") for nft in valid_nfts],
-        "collection_slug": [nft.get("collection", "") for nft in valid_nfts],
-        "is_spam": [False]
-        * len(valid_nfts),  # This will be updated by your is_spam function
-        "floor_price": [nft.get("floor_price", 0) for nft in valid_nfts],
-        "price_currency": [nft.get("price_currency", "ETH") for nft in valid_nfts],
-        "description": [nft.get("description", "") for nft in valid_nfts],
-        "last_ingested_at": [nft.get("updated_at", "") for nft in valid_nfts],
-        "total_supply": [nft.get("total_supply", 0) for nft in valid_nfts],
-        "image_url": [nft.get("image_url", "") for nft in valid_nfts],
-        # New Twitter features
-        "twitter_sentiment": [nft.get("twitter_sentiment", 0.0) for nft in valid_nfts],
-        "twitter_tweet_volume": [
-            nft.get("twitter_tweet_volume", 0) for nft in valid_nfts
-        ],
-        "twitter_positive_tweets": [
-            nft.get("twitter_positive_tweets", 0) for nft in valid_nfts
-        ],
-        "twitter_negative_tweets": [
-            nft.get("twitter_negative_tweets", 0) for nft in valid_nfts
-        ],
-        "twitter_neutral_tweets": [
-            nft.get("twitter_neutral_tweets", 0) for nft in valid_nfts
-        ],
+# Rename columns in df_for_ml
+df_for_ml = df_for_ml.rename(
+    columns={
+        "identifier": "token_id",
+        "collection": "collection_slug",
+        "contract": "contract_address",
+        "opensea_floor_price": "floor_price_from_ml",  # Rename to avoid direct conflict and allow prioritization
     }
+)
 
-    df = pd.DataFrame(data)
-    print(f"DataFrame created with shape: {df.shape}")
-    df.to_csv("nft_data.csv")  # Save initial data for debugging
+# Rename columns in df_mid_drop
+df_mid_drop = df_mid_drop.rename(
+    columns={
+        "identifier": "token_id",
+        "collection": "collection_slug",
+        "contract": "contract_address",
+        "opensea_floor_price": "floor_price_from_mid_drop",  # Rename to avoid direct conflict
+    }
+)
 
-    # Apply spam filtering with collection metadata
-    # The fetch_collection_metadata already uses the corrected URL
-    df["collection_meta"] = [
-        fetch_collection_metadata(nft.get("collection", "")) for nft in valid_nfts
-    ]
+# Add a 'source_file' column to track where data came from (useful for debugging)
+df_cleaned["source_file_cleaned"] = True
+df_for_ml["source_file_for_ml"] = True
+df_mid_drop["source_file_mid_drop"] = True
 
-    # For debugging the input to is_spam:
-    # for nft_item, meta_item in zip(valid_nfts, df["collection_meta"]):
-    #     print("NFT data for is_spam:", nft_item)
-    #     print("Collection meta for is_spam:", meta_item)
+# --- 3. Merge DataFrames iteratively ---
+# Start with df_cleaned as the base.
+# Use 'contract_address' and 'token_id' as merge keys for NFT-level uniqueness.
+# Use 'outer' merge to ensure no data is lost and all NFTs are included.
 
-    # df["is_spam"] = [
-    #     is_spam(nft, meta) for nft, meta in zip(valid_nfts, df["collection_meta"])
-    # ]
-    # df = df[df["is_spam"] == False].reset_index(drop=True)
+# Merge df_for_ml into df_cleaned
+# Handle suffixes if column names overlap (e.g., 'description_x', 'description_y')
+combined_df = pd.merge(
+    df_cleaned,
+    df_for_ml,
+    on=["contract", "identifier"],
+    how="outer",
+    suffixes=("_cleaned", "_for_ml"),
+)
 
-    # Clean up temporary column
-    df = df.drop(columns=["collection_meta"])
+# Merge df_mid_drop into the combined_df
+combined_df = pd.merge(
+    combined_df,
+    df_mid_drop,
+    on=["contract_address", "token_id"],
+    how="outer",
+    suffixes=("_combined", "_mid_drop"),
+)
 
-    # Save raw and cleaned data]
-    df.to_csv("nft_data_cleaned.csv", index=False)
-    print(f"Saved {len(df)} non-spam NFTs to nft_data_cleaned.csv")
+# --- Resolve conflicting columns after merges ---
+# For columns that appeared in multiple original DataFrames (e.g., 'floor_price', 'description'),
+# we need to consolidate them into a single column.
+# Priority: df_for_ml/df_mid_drop (as they might have 'opensea_floor_price') -> df_cleaned.
+# For descriptive text, take the first non-null. For numerical, take the non-null.
 
-    # 9. ML Model (Optional)
-    if not df.empty and len(df) > 10:
-        # Add new numeric features
-        numeric_features = [
-            "floor_price",
-            "balance",
-            "total_supply",
-            "twitter_sentiment",
-            "twitter_tweet_volume",
-            "twitter_positive_tweets",
-            "twitter_negative_tweets",
-            "twitter_neutral_tweets",
-        ]
-        for col in numeric_features:
-            df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
+# Consolidate 'floor_price'
+# Use 'floor_price_from_ml' or 'floor_price_from_mid_drop' if available and not NaN, else use 'floor_price_cleaned'
+# Fill NaNs from right to left (more recent sources if available)
+combined_df["floor_price"] = (
+    combined_df["floor_price_from_ml"]
+    .fillna(combined_df["floor_price_from_mid_drop"])
+    .fillna(combined_df["floor_price_cleaned"])
+)
 
-        X = df[numeric_features].copy()
+# Drop the now redundant original floor price columns
+combined_df.drop(
+    columns=["floor_price_cleaned", "floor_price_from_ml", "floor_price_from_mid_drop"],
+    errors="ignore",
+    inplace=True,
+)
 
-        # Encode categorical variables
-        encoder = OneHotEncoder(sparse_output=False, drop="first")
-        categorical_cols = [
-            "token_type",
-            "collection_slug",
-            "price_currency",
-        ]  # Added price_currency as categorical
-        for col in categorical_cols:
-            if col not in df.columns:
-                df[col] = ""
-        encoded_cols = encoder.fit_transform(df[categorical_cols])
-        encoded_df = pd.DataFrame(
-            encoded_cols, columns=encoder.get_feature_names_out(categorical_cols)
-        )
-        X = pd.concat([X, encoded_df], axis=1)
-        print("final df\n\n\n", df)
-        # Train-test split and model
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, df["is_spam"], test_size=0.2, random_state=42
-        )
-        model = RandomForestClassifier(n_estimators=100, random_state=42)
-        model.fit(X_train, y_train)
-        accuracy = model.score(X_test, y_test)
-        print(f"Model Accuracy: {accuracy}")
-    else:
-        print("Not enough non-spam data to train model.")
+
+# Consolidate 'description' (take first non-null)
+if "description_for_ml" in combined_df.columns:
+    combined_df["description"] = combined_df["description_cleaned"].fillna(
+        combined_df["description_for_ml"]
+    )
+    combined_df.drop(
+        columns=["description_cleaned", "description_for_ml"],
+        errors="ignore",
+        inplace=True,
+    )
+elif "description_cleaned" in combined_df.columns:
+    combined_df.rename(columns={"description_cleaned": "description"}, inplace=True)
+
+
+# Consolidate 'collection_name' and 'collection_slug'
+# These are crucial for grouping and should be consistent. Take non-null from any source.
+if "collection_name_for_ml" in combined_df.columns:
+    combined_df["collection_name"] = combined_df["collection_name_cleaned"].fillna(
+        combined_df["collection_name_for_ml"]
+    )
+    combined_df.drop(
+        columns=["collection_name_cleaned", "collection_name_for_ml"],
+        errors="ignore",
+        inplace=True,
+    )
+elif "collection_name_cleaned" in combined_df.columns:
+    combined_df.rename(
+        columns={"collection_name_cleaned": "collection_name"}, inplace=True
+    )
+
+if "collection_slug_for_ml" in combined_df.columns:
+    combined_df["collection_slug"] = combined_df["collection_slug_cleaned"].fillna(
+        combined_df["collection_slug_for_ml"]
+    )
+    combined_df.drop(
+        columns=["collection_slug_cleaned", "collection_slug_for_ml"],
+        errors="ignore",
+        inplace=True,
+    )
+elif "collection_slug_cleaned" in combined_df.columns:
+    combined_df.rename(
+        columns={"collection_slug_cleaned": "collection_slug"}, inplace=True
+    )
+
+
+# Consolidate 'total_supply'
+if "total_supply_for_ml" in combined_df.columns:
+    combined_df["total_supply"] = combined_df["total_supply_cleaned"].fillna(
+        combined_df["total_supply_for_ml"]
+    )
+    combined_df.drop(
+        columns=["total_supply_cleaned", "total_supply_for_ml"],
+        errors="ignore",
+        inplace=True,
+    )
+elif "total_supply_cleaned" in combined_df.columns:
+    combined_df.rename(columns={"total_supply_cleaned": "total_supply"}, inplace=True)
+
+
+# Clean up remaining suffixed columns (e.g., _cleaned, _for_ml, _combined, _mid_drop) that were not explicitly handled if they represent the same data
+cols_to_drop_suffixes = [
+    col
+    for col in combined_df.columns
+    if col.endswith(("_cleaned", "_for_ml", "_combined", "_mid_drop"))
+    and col not in ["source_file_cleaned", "source_file_for_ml", "source_file_mid_drop"]
+]
+combined_df.drop(columns=cols_to_drop_suffixes, errors="ignore", inplace=True)
+
+
+print(
+    f"\nCombined DataFrame shape after merging and consolidating: {combined_df.shape}"
+)
+print("Combined DataFrame columns after consolidation:\n", combined_df.columns.tolist())
+print("\nFirst 5 rows of Combined DataFrame after consolidation:")
+print(combined_df.head())
+
+# --- 4. Basic Data Cleaning and Type Conversion ---
+numeric_features = [
+    "floor_price",
+    "total_supply",
+    "opensea_market_cap",
+    "opensea_volume_30D",
+    "opensea_volume_all_time",
+    "opensea_average_price",
+    "opensea_sales_7D",
+    "opensea_avg_price_7D",
+    "opensea_volume_7D",
+    "opensea_sales_30D",
+    "opensea_sales_all_time",
+    "opensea_sales_24hr",
+    "opensea_avg_price_24hr",
+    "opensea_avg_price_30D",
+    "opensea_volume_24hr",
+    "opensea_floor_price_24hr",
+    "opensea_num_owners",
+    "balance",
+    "twitter_tweet_volume",
+    "twitter_positive_tweets",
+    "twitter_negative_tweets",
+    "twitter_neutral_tweets",
+]
+
+for col in numeric_features:
+    if col in combined_df.columns:
+        combined_df[col] = pd.to_numeric(combined_df[col], errors="coerce").fillna(0)
+
+# Drop 'Unnamed: 0' if it exists and is an artifact
+if "Unnamed: 0" in combined_df.columns:
+    combined_df = combined_df.drop(columns=["Unnamed: 0"])
+
+datetime_cols = ["last_ingested_at", "updated_at"]
+for col in datetime_cols:
+    if col in combined_df.columns:
+        combined_df[col] = pd.to_datetime(combined_df[col], errors="coerce")
+
+# --- 5. Feature Engineering (Basic Example) ---
+if (
+    "total_supply" in combined_df.columns
+    and "opensea_num_owners" in combined_df.columns
+    and "owner_ratio" not in combined_df.columns
+):
+    combined_df["owner_ratio"] = combined_df["opensea_num_owners"] / combined_df[
+        "total_supply"
+    ].replace(0, pd.NA)
+    combined_df["owner_ratio"] = (
+        combined_df["owner_ratio"].fillna(0).replace([float("inf"), -float("inf")], 0)
+    )
+
+if (
+    "floor_price" in combined_df.columns
+    and "opensea_market_cap" in combined_df.columns
+    and "price_to_market_cap_ratio" not in combined_df.columns
+):
+    combined_df["price_to_market_cap_ratio"] = combined_df["floor_price"] / combined_df[
+        "opensea_market_cap"
+    ].replace(0, pd.NA)
+    combined_df["price_to_market_cap_ratio"] = (
+        combined_df["price_to_market_cap_ratio"]
+        .fillna(0)
+        .replace([float("inf"), -float("inf")], 0)
+    )
+
+print("\n--- Combined DataFrame Info after cleaning and basic feature engineering ---")
+combined_df.info()
+
+# --- 6. Store the processed data in a final CSV ---
+output_csv_path = "final_nft_data_processed.csv"
+combined_df.to_csv(output_csv_path, index=False)
+print(f"\nProcessed and combined data saved to '{output_csv_path}'.")
+
+# --- 7. Reiterate DappRadar Historical Data Limitation ---
+print("\n--- Important Note on DappRadar Historical Data ---")
+print(
+    "The 'dappradar_historical_data.json' file you provided is the DappRadar API documentation, not the raw historical data."
+)
+print(
+    "To get actual **yearly historical data** for NFTs (like detailed daily floor prices or volumes from DappRadar), you would need to:"
+)
+print("1. **Obtain an API key** from DappRadar.")
+print(
+    "2. **Use the DappRadar API endpoints** (as described in the documentation, e.g., `/nfts/collections` or `/dapps/{dappId}/history/{metric}`) to fetch the historical data programmatically."
+)
+print(
+    "3. Once you retrieve that data, it can be loaded and integrated into this combined dataset for more comprehensive risk evaluation and charting of NFT price movements."
+)
+print(
+    "This script has successfully combined and processed the CSV files you provided, but it does not include the actual historical data from DappRadar as it was not provided in a raw data format."
+)
